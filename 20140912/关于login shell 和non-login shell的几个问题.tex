@@ -1,0 +1,162 @@
+\documentclass[notheorems,mathserif,table,compress,10pt]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+% \usecolortheme[<options>]{<name list>}
+%% Font Themes
+\usefonttheme[small]{serif}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+\usepackage{iplouccfg}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+  \frame<handout:0>{
+    \frametitle{Content}\small
+    \tableofcontents[current,currentsubsection]
+  }
+}
+
+\AtBeginSubsection[]                            % 在每个子段落之前
+{
+  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+  {
+    \frametitle{Content}\small
+    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+  }
+}
+
+%%----------------------------------------------------------
+%\title{中国海常见有害赤潮藻显微图像识别}
+\title{关于login shell和 non-login shell 的几个问题 }
+%\subtitle{~~~~~-A Week }
+\author[OUC]{Name：~~~~~\textcolor{olive}{Sun Xiaoqing}\\
+    \quad Major：~~\textcolor{olive}{Electronics and Communication Engineering}}
+%\author{\textcolor{olive}{Sun xiaoqing}}
+    %\quad Major~~\textcolor{olive}{电子与通信工程}
+%\institute[中国海洋大学]{\small\textcolor{violet}{中国海洋大学~~信息科学与工程学院}}
+\date{September 12, 2014 ~}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+\section*{Content}
+\frame{\frametitle{Content}\tableofcontents}
+%%----------------------------------------------------------
+
+
+
+\section{什么是login shell和 non-login shell?}
+
+\begin{frame}
+\frametitle{什么是shell？}
+\begin{itemize}
+\item shell 叫做壳。它接收用户命令，然后调用相应的应用程序。
+\end{itemize}
+\end{frame}  
+
+\begin{frame}
+\frametitle{login shell和 non-login shell}
+\begin{itemize}
+\item  {\color{blue}\textbf{ login shell}}:我们开机后，首次登录的终端就是一个login  shell。
+\item  {\color{blue}\textbf{ non-login shell}}:在第二次及以后登录终端，这个bash 环境都是一个non-login shell。
+\end{itemize}
+\end{frame}  
+
+\section{login shell和 non-login shell的区别？}
+\begin{frame}
+\frametitle{login shell和 non-login shell的区别：系统读取的配置文件不同}
+\begin{itemize}
+\item  {\color{blue}\textbf{ login shell}}系统会先读取/etc/profile, 然后再依次读取$\sim$$/.bash\_profile$ 或$\sim$$/.bash\_login$ 或$\sim$$/.proflie$ 这些配置文件。
+\begin{itemize}
+\item  /etc/profile是系统文件，最好不要轻易更改这个文件。
+\item $\sim$$/.bash\_profile$ 或$\sim$$/.bash\_login$ 或$\sim$$/.proflie$这些配置文件属于用户自己的，如果你想要添加路径的话，在这些文件里添加就可以。
+\end{itemize}
+\item  {\color{blue}\textbf{ non-login shell}}系统会自动的读取$\sim$$/.bashrc$中的配置文件。
+\end{itemize}
+ \end{frame}
+
+
+
+\begin{frame}
+\frametitle{对于ubuntu14.04}
+如果 login shell登录时，是不是无法读取到$\sim$$/.bashrc$中的文件呢？
+\begin{figure}\centering 
+  \begin{minipage}[t]{0.9\linewidth} 
+    
+    \includegraphics[width=1\linewidth]{profile.png}
+%    \label{fig:} 
+\caption{$\sim$$/.proflie$}
+  \end{minipage} 
+   \end{figure} 
+ 为了保证login shell 时也可以读取到 non-login shell 中的配置文件。
+ \end{frame}
+\begin{frame}
+
+\frametitle{安装软件的路径添加在哪里？}
+比如以我们安装\LaTeX{} 为例：
+\begin{itemize}
+\item  /etc/profile是系统文件，最好不要把路径添加这个文件。
+\item 把路径添加到  $\sim$$/.proflie$下，当我们login shell 时，这些路径就开始生效。
+\item 把路径添加在 $\sim$$/.bashrc$ 下，在你login shell和 non-login shell 时，路径都会生效。(个人觉得添加在这里最好)
+\end{itemize}
+ \end{frame}
+
+\section{其他的一些 login shell 和non-login shell}
+\begin{frame}
+\frametitle{login shell和 non-login shell}
+\begin{itemize}
+\item 登录系统时获得的顶层shell，无论是通过本地终端登录，还是通过网络ssh登录。这种情况下获得的login shell是一个交互式shell。
+\item  在终端下使用$--$$login$选项调用bash，可以获得一个交互式login shell。
+\item  在脚本中使用$--$$login$选项调用bash,（比如在shell脚本第一行做如下指定：\#!/bin/bash - -login），此时得到一个非交互式的login shell。
+\item 使用"$su$ $-$"切换到指定用户时，获得此用户的login shell。如果不使用"$-$"，则获得$non-login shell$。 
+\end{itemize}
+\end{frame}  
+
+\begin{frame}
+\frametitle{疑问？}
+\begin{itemize}
+\item 为什么会有 login shell 和non-login shell？ 这样设计的初衷是为什么？
+\end{itemize}
+\end{frame}  
+
+\begin{frame}
+\begin{figure}\centering 
+  \begin{minipage}[t]{0.7\linewidth} 
+    \includegraphics[width=\linewidth]{thank.png}
+%    \label{fig:} 
+  \end{minipage}
+\end{figure} 
+\end{frame}
+
+
+\end{document}
