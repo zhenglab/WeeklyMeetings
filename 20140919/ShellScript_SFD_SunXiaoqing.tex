@@ -1,0 +1,278 @@
+\documentclass[notheorems,mathserif,table,compress,10pt]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+% \usecolortheme[<options>]{<name list>}
+%% Font Themes
+\usefonttheme[small]{serif}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+\usepackage{iplouclistings}
+\usepackage{iplouccfg}
+\usepackage{tcolorbox}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+  \frame<handout:0>{
+    \frametitle{内容}\small
+    \tableofcontents[current,currentsubsection]
+  }
+}
+
+\AtBeginSubsection[]                            % 在每个子段落之前
+{
+  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+  {
+    \frametitle{Content}\small
+    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+  }
+}
+
+%%----------------------------------------------------------
+%\title{中国海常见有害赤潮藻显微图像识别}
+\title{Shell 脚本那些事}
+%\subtitle{~~~~-想和你分享}
+\author[CVBIOUC]{~~\textcolor{olive}{孙晓庆 \quad王如晨}\\
+    \quad \textcolor{olive}{CVBIOUC}\\
+    \textcolor{blue}{\url{http://vision.ouc.edu.cn/~zhenghaiyong}
+    \\
+    \href{mailto:sunxiaoqingouc@gmail.com}{sunxiaoqingouc@gmail.com}}
+    }
+%\author{\textcolor{olive}{Sun xiaoqing}}
+    %\quad Major~~\textcolor{olive}{电子与通信工程}
+%\institute[中国海洋大学]{\small\textcolor{violet}{中国海洋大学~~信息科学与工程学院}}
+\date{2014~年~9~月~19~日}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+\section*{内容}
+\frame{\frametitle{内容}\tableofcontents}
+%%----------------------------------------------------------
+
+\section{初遇shell 脚本 }
+
+\begin{frame}
+\frametitle{因实验需要而使用}
+\begin{tcolorbox}[colback=blue!5,colframe=blue!75!black]
+
+ 我对5万张放在嵌套文件夹下的图像进行实验，实验后每张图像生成了三个文件，其中一个是.txt文件。为了对实验数据分析，我需要把这5万个txt 文件的数据合并到一个总的.txt文件中，并记录每个.txt数据的路径。
+\end{tcolorbox}
+
+\end{frame}  
+
+\begin{frame}
+\frametitle{面对这个问题}
+解决方案？
+\begin{itemize}
+\item  手动
+\item  用Matlab 或C语言编写程序实现
+\item  简单好用的方法----- shell 脚本
+\end{itemize}
+\end{frame}  
+
+
+ \begin{bash}
+ #!/bin/bash  
+ INPUTDIR=$1
+ OUTPUTTXT=$2
+ num=1
+ for i in $(find ${INPUTDIR} -type f -name "*.txt"|grep -v "TimeNumber.txt"); do  
+  line2=`sed -n '2p' $i`
+  echo -e "$((num++))\t$i\t${line2}" >> $OUTPUTTXT
+  done
+ \end{bash}
+ 
+ \begin{frame}
+\frametitle{Shell 脚本也可以“高大上”}
+\begin{tcolorbox}[colback=blue!5,colframe=blue!75!black]
+  对脚本做了完善 
+\end{tcolorbox}
+\end{frame}  
+ 
+ \begin{bash}
+#!/bin/bash
+
+if [ $# != 2 ]; then
+	echo -ne "Arguments Error.\n"
+	echo -ne "\tUsage:\n"
+	echo -ne "\t$0 <INPUTDIR> <OUTPUTTXT>\n"
+	exit 7
+fi
+
+INPUTDIR=$1
+OUTPUTTXT=$2
+num=1
+
+if [ -f ${OUTPUTTXT} ]; then
+	rm -f ${OUTPUTTXT}
+fi
+
+for i in $(find ${INPUTDIR} -type f -name "*.txt"|grep -v "TimeNumber.txt"); do
+	echo -ne "$((num++)): Processing \033[41;33m $i \033[0m" 
+	line2=`sed -n '2p' $i`
+	echo -e "$((num-1))\t$i\t${line2}" >> $OUTPUTTXT
+	echo -ne "\t DONE!\n"
+done
+echo -ne "\n"
+echo -ne "\t\tEND PROCESSING $((num-1)) TEXTS!\n"
+\end{bash}
+
+ \begin{frame}
+\frametitle{其它的批处理问题}
+\begin{itemize}
+\item  两个文件夹下分别有 1000 幅图片,其图片名不一样,但内容可能一样, 编写脚本找到内容一样的图像。
+\item 某文件夹下有 100 个 pdf 格式的文件,文件按数字 1-100 命名,如果要 在中间加入一个文件 27.pdf,那么原文件夹中文件从 27 开始就要依次 加 1。
+\item  将某文件夹下的所有文件（扩展名都相同）重新按数字命名。
+\item  要在某目录下的所有子文件夹中新建 test 的文件夹。
+\end{itemize}
+\end{frame}  
+
+
+
+ \section{再用shell 脚本}
+\begin{frame}
+\frametitle{实验的自动操作 ----- 追求真正的简单 }
+\begin{itemize}
+\item  {\color{blue}\textbf{ 写实验的自动操作shell 脚本前}}
+\begin{itemize}
+\item打开matlab运行程序。
+\item 在终端调用脚本MergeTXT.sh,把结果合并成总的 .txt文件。
+\item  在终端用$gnuplot$对总的.txt文件里的数据画图分析。 
+\item  在实验过程中，我需要多次调参数，需要多次进行实验。需要多次重复上述过程，花费很多时间。
+\end{itemize}
+\item  {\color{blue}\textbf{ 写实验的自动操作shell 脚本后}}
+\begin{itemize}
+\item  只需要设定好参数值的范围，在终端直接运行 shell 脚本。
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+ \begin{bash}
+ #!/bin/bash
+
+MatlabEXE='/Applications/MATLAB_R2013a.app/bin/matlab'
+InputDir='/Users/sunxiaoqing/Desktop/FSD/RunTest'
+BinDir='/Users/sunxiaoqing/bin'
+MatlabFileDir="${InputDir}/MatlabProgram/test.m"
+MatlabResultDir="${InputDir}/MatlabResult"
+MergeTXTResultDir="${InputDir}/MergeTXTResult/"
+GnuplotResultDir="${InputDir}/GnuplotResult/"
+StartNum=20
+StartGnuplotNum=20
+
+chmod +x $MatlabFlieDir
+${MatlabEXE} -nodesktop -nosplash  -r "run ${MatlabFlieDir};quit"
+
+for i in $(find ${MatlabResultDir} -name 'result*');  do
+         j="${MergeTXTResultDir}/result$((StartNum++)).txt"
+         source "${BinDir}/MergeTXT.sh"  $i $j
+done
+for k in $(find ${MergeTXTResultDir} -type f -name "*.txt"); do
+         GnuplotFilename="${GnuplotResultDir}""result""$((StartGnuplotNum++))"".jpg"
+         source "${BinDir}/PlotTXTdata.sh" $GnuplotFilename  $k
+done
+ \end{bash}
+
+
+\section{Shell 脚本}
+
+\begin{frame}
+\frametitle{Shell 脚本是什么}
+ \begin{itemize}
+ \item Shell 脚本语言包括了所有linux 命令，以及同时还有类似于高级程序设计语言的语法结构，如分支判断语句、变量和函数、循环结构、数组、算术和逻辑运算等。
+  \item  Shell 脚本：为了实现特定功能，用脚本语言编写的一个程序。
+
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Shell 脚本的用途}
+ \begin{itemize}
+ \item 文件的批处理
+\item  电脑中的重要文件的自动备份 
+\item  将服务器上的资料同步到本地
+\item   连续命令单一化
+\item   对主机的管理
+\item  $\cdots\cdots$ 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Shell 脚本的好处}
+ \begin{itemize}
+  \item 简单、易学、易用。
+ \item 处理复杂的批处理问题。
+ \item 调用系统已有的资源，去实现一些特定的功能。
+ \item 可移植性比较好。
+ \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{如果你也对Shell脚本感兴趣}
+ \begin{itemize}
+  \item Shell 十三问
+ \item https://github.com/zhenghaiyong/Scripts
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{tcolorbox}[colback=blue!5,colframe=blue!75!black]
+感谢我们的郑老师，带我们走进Linux！
+\end{tcolorbox}
+\begin{figure}\centering 
+  \begin{minipage}[t]{0.7\linewidth} 
+    
+    \includegraphics[width=\linewidth]{team1.jpg}
+%    \label{fig:} 
+  \end{minipage}
+\end{figure} 
+\end{frame}
+
+
+
+\begin{frame}
+
+\begin{figure}\centering 
+  \begin{minipage}[t]{0.7\linewidth} 
+    
+    \includegraphics[width=\linewidth]{thank.png}
+%    \label{fig:} 
+  \end{minipage}
+\end{figure} 
+\end{frame}
+
+
+\end{document}
