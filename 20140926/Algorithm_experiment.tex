@@ -1,0 +1,197 @@
+\documentclass[notheorems,mathserif,table,compress,dvipsnames]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{verbatim}
+\usepackage{mathabx}
+\usepackage{amsfonts,amssymb}
+\usepackage{iplouclistings}
+\usepackage{color}
+\usepackage{fancybox}
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes双精度计算
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+%\usecolortheme[<options>]{<name list>}
+%% Font Themes
+\usefonttheme{serif}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+%\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+%  \frame<handout:0>{
+%    \frametitle{Contents}\small
+%    \tableofcontents[current,currentsubsection]
+%  }
+%}
+
+%\AtBeginSubsection[]                            % 在每个子段落之前
+%{
+%  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+%  {
+%    \frametitle{Contents}\small
+%    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+%  }
+%}
+%
+%%----------------------------------------------------------
+\title{Partial Differential Equation and Image Processing}
+\subtitle{~~~~~-A Week Summary}
+\author[Qiu]{\textcolor{olive}{QiuXinxin}}
+\institute[OUC]{\small\textcolor{violet}{Ocean University of China}\\
+\small\textcolor{violet}{College of Information Science and Engineering}}
+\date{September 26, 2014}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{Contents}
+%\frame{\frametitle{Solving Systems of Linear Equations}\tableofcontents}
+%%----------------------------------------------------------
+
+%
+\begin{frame}
+\frametitle{Peak signal-to-noise ratio(PSNR) }
+\begin{itemize}
+\item Wiener, L-R, Regularized, Deconvblind, NNCGM
+\item The PSNR, defined by
+\begin{displaymath}
+PSNR=10\log_{10}\bigg(\frac{(2^n-1)^2}{MSE}\bigg)
+\end{displaymath}
+MSE-MeanSquareError
+\end{itemize}
+\end{frame}
+
+%
+\begin{frame}
+\frametitle{Test nncgm algorithm}
+\begin{table}
+\begin{tabular}{|c|c|c|c|c|c|c|} 
+\hline
+sigma&image& \multicolumn{1}{|c|}{Wiener}&LR&Regularized&Decon&NNCGM\\
+\cline{3-7}
+&& psnr&psnr&psnr&psnr&psnr\\
+%sigma&image&Wiener&LR&Regularized&Deconvblind&NNCGM\\
+\hline
+%& &psnr&&&&\\  
+%\hline
+15&satellite&3.6086&22.1536&21.8713&23.8652&26.1569\\
+\hline
+30&satellite&3.9532&22.8697&23.7966&26.2953&27.8230\\
+\hline
+45&satellite&3.9358&22.8958&23.7578&26.0631&27.8472\\
+\hline
+%45&7&12&&&&\\
+%\hline
+%NNCGM&&&&&&\\
+%\hline
+\end{tabular}
+\caption{Result with PSF=5X5, noisevar=0.001}
+\end{table}
+\end{frame}
+
+%
+\begin{frame}
+\frametitle{ }
+\begin{figure}[!ht]
+\includegraphics[width=5.2in]{satelite-5x5-15-0001.jpg}
+\caption{result with PSF=5X5, sigma=15, noisevar=0.001}
+\end{figure}
+\end{frame}
+
+%
+\begin{frame}
+\frametitle{}
+\begin{table}
+\begin{tabular}{|c|c|c|c|c|c|c|} 
+\hline
+sigma&image& \multicolumn{1}{|c|}{Wiener}&LR&Regularized&Decon&NNCGM\\
+\cline{3-7}
+&& psnr&psnr&psnr&psnr&psnr\\
+\hline
+15&license&4.9973&19.8336&29.2548&25.4769&21.5675\\
+\hline
+30&license&5.0245&19.7909&27.2769&25.4637&21.4644\\
+\hline
+45&license&5.0195&19.7975&27.2420&25.5416&21.4976\\
+\hline
+\end{tabular}
+\caption{Result with PSF=5X5, noisevar=0.01}
+\end{table}
+\end{frame}
+
+%
+\begin{frame}
+\frametitle{ }
+\begin{figure}[!ht]
+\includegraphics[width=5.2in]{license-5x5-40-001.jpg}
+\caption{result with PSF=5X5, sigma=40, noisevar=0.01}
+\end{figure}
+\end{frame}
+
+%
+\begin{frame}
+\frametitle{}
+\begin{table}
+\begin{tabular}{|c|c|c|c|c|c|c|} 
+\hline
+psf&image& \multicolumn{1}{|c|}{Wiener}&LR&Regularized&Decon&NNCGM\\
+\cline{3-7}
+&& psnr&psnr&psnr&psnr&psnr\\
+\hline
+5X5&satellite&3.6140&15.5458&18.6767&20.4977&16.2139\\
+\hline
+9X9&satellite&3.4887&15.5262&17.3443&18.9824&16.9114\\
+\hline
+\end{tabular}
+\caption{Result with sigma=15, noisevar=0.001}
+\end{table}
+\end{frame}
+
+
+%
+\begin{frame}
+\frametitle{ }
+\begin{figure}[!ht]
+\includegraphics[width=5.2in]{satellite-9x9-15-0001.jpg}
+\caption{result with PSF=9X9, sigma=15, noisevar=0.001}
+\end{figure}
+\end{frame}
+
+%
+\begin{frame}
+\frametitle{ }
+\begin{figure}[!ht]
+\includegraphics[width=5.2in]{board-5x5-45-0001.jpg}
+\caption{result with PSF=5X5, sigma=45, noisevar=0.001}
+\end{figure}
+\end{frame}
+
+
+\end{document}
