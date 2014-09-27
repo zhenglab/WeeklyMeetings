@@ -1,0 +1,833 @@
+\documentclass[notheorems,mathserif,table,compress]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{comment}
+\usepackage{fancybox}
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+% \usecolortheme[<options>]{<name list>}
+%% Font Themes
+% \usefonttheme[<options>]{<name>}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+\begin{comment}
+\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+  \frame<handout:0>{
+    \frametitle{Content}\small
+    \tableofcontents[current,currentsubsection]
+  }
+}
+\AtBeginSubsection[]                            % 在每个子段落之前
+{
+  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+  {
+    \frametitle{下一节内容}\small
+    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+  }
+}
+\end{comment}
+%%----------------------------------------------------------
+\title[Object Detection]{Object Detection}
+\subtitle{---Something about it}
+\author[CVBIOUC]{主讲人~~~~~\textcolor{olive}{赵海伟}\\
+    \quad 幻灯片制作~~\textcolor{olive}{赵海伟}}
+\institute[Ocean University of China]{\small\textcolor{violet}{中国海洋大学~~信息科学与工程学院}}
+\date{\today}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{目录}
+\frame{\frametitle{content}\tableofcontents}
+%%----------------------------------------------------------
+
+%\section{Beamer类和XeTeX概览} %如果你想书签不出现问题,请不要用\XeTeX
+                                 %这类复杂的指令,直接写XeTeX吧
+\section{What is Object Detection?}
+
+\begin{frame}
+  \frametitle{What is Object Detection?}  
+  \begin{itemize}
+  \item 是基于\{目标几何\}和\{统计特征\}的\{图像分割\}。
+  \item 将目标的\{分割\}和\{识别\}合二为一。
+  \item \{准确性\}和\{实时性\}是整个系统的一项重要能力。
+  \item 尤其是在复杂场景中，需要对多个目标进行实时处理时，目标自动提取和识别就显得特别重要。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What is Object Detection?}  
+  \begin{figure}[!ht]
+  \centering\includegraphics[width=3.8in]{a.png}
+  \caption{Object Detection}
+  \end{figure}
+\end{frame}%目标检测定义
+
+\section{Why we research  Object Detection?}
+
+\begin{frame}
+  \frametitle{Why we research  Object Detection?}  
+  \begin{itemize}
+  \item 计算机技术的发展和计算机视觉原理的广泛应用。
+  \item 利用计算机图像处理技术对目标进行实时跟踪研究越来越热门。
+  \item 对目标进行动态实时跟踪定位在智能化交通系统、智能监控系统、军事目标检测及医学导航手术中手术器械定位等方面具有广泛的应用价值。
+  \end{itemize}
+\end{frame}%目标检测发展
+
+\section{What relates to Object Detection?}
+
+\begin{frame}
+  \frametitle{What relates to Object Detection?}  
+  \begin{itemize}
+  \item 1.Segmentation
+  \item 2.Object detection and recognition
+  \item 3.Salient object detection
+  \end{itemize}
+\end{frame}%目标检测相关
+
+\section{What makes up Object Detection?}
+
+\begin{frame}
+  \frametitle{What makes up Object Detection?}  
+  \begin{itemize}
+  \item 特征点检测（Point Detector）
+  \item 背景建模（Background Modeling）
+  \item 图像分割（Segmentation）
+  \item 监督学习（Supervised Classifiers）
+  \end{itemize}
+\end{frame}%目标检测分类
+
+\subsection{特征点检测（Point Detector）}
+
+\begin{frame}
+  \frametitle{特征点检测（Point Detector）}  
+  \begin{figure}[!ht]
+  \centering\includegraphics[width=1.2in]{b.png}
+  \caption{Point Detector}
+  \item 特征点是在各自位置具有代表性纹理特征的点,是图像很重要的特征,对图像图形的理解和分析有很重要的作用。
+  \end{figure}
+\end{frame}%可能-----调整
+
+\begin{frame}
+  \frametitle{特征点检测（Point Detector）}  
+  \begin{itemize}
+  \item 点特征的优势：
+  \item （1）点特征属于局部特征，对遮挡有一定鲁棒性。
+  \item （2）通常图像中可以检测到成百上千的点特征，以量取胜。
+  \item （3）点特征有较好的辨识性，不同物体上的点容易区分。
+  \item （4）点特征提取通常速度很快。
+  \item （5）对光照和摄像头视角变换具有不变性。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{特征点检测（Point Detector）}  
+  \begin{figure}[!ht]
+  \centering\includegraphics[width=2in]{c.png}
+  \caption{Point Detector}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{特征点检测（Point Detector）}  
+  \begin{itemize}
+  \item 比较牛逼的几个点特征：
+  \item 1.SIFT
+  \item 2.SURF
+  \item 3.Harris
+  \end{itemize}
+\end{frame}%点检测
+
+\subsection{背景建模（Background Modeling）}
+
+\begin{frame}
+  \frametitle{背景建模（Background Modeling）}  
+  \begin{figure}[!ht]
+  \centering\includegraphics[width=2.7in]{d.png}
+  \caption{Background Modeling}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{背景建模（Background Modeling）}  
+  \begin{itemize}
+  \item 背景建模，然后进行背景减除，剩下前景视作所求的目标，也是目标检测的一类方法。
+  \item 背景模型的巨大变化即意味着目标移动。
+  \item 背景建模其实就是前景检测。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{背景建模（Background Modeling）}  
+  \begin{itemize}
+  \item 比较牛逼的背景建模：
+  \item VIBE（Visual Background Extractor）（牛逼）
+  \item 简介：ViBe是一种像素级视频背景建模或前景检测的算法，2009年提出来的用于进行快速\{背景提取\}和\{运动目标检测\}的算法，具有较高的实时性和鲁棒性。
+  \end{itemize}
+\end{frame}%背景建模
+
+\subsection{图像分割（Segmentation）}
+
+\begin{frame}
+  \frametitle{图像分割（Segmentation）}  
+  \begin{figure}[!ht]
+  \centering\includegraphics[width=3.2in]{e.png}
+  \caption{Segmentation}
+  \item 图像分割就是把图像分成若干个特定的、具有独特性质的区域并提出感兴趣目标的技术和过程,是由\{图像处理\}到\{图像分析\}的关键步骤。
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{图像分割（Segmentation）}  
+  \begin{itemize}
+  \item 现有的图像分割方法主要分以下几类：
+  \item （1）基于阈值的分割方法
+  \item （2）基于区域的分割方法
+  \item （3）基于边缘的分割方法
+  \item （4）基于特定理论的分割方法
+  \end{itemize}
+\end{frame}%图像分割
+
+\subsection{监督学习（Supervised Classifiers）}
+
+\begin{frame}
+  \frametitle{监督学习（Supervised Classifiers）}  
+  \begin{itemize}
+  \item 监督学习（Supervised Classifiers）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{监督学习（Supervised Classifiers）}  
+  \begin{figure}[!ht]
+  \centering\includegraphics[width=3.8in]{a.png}
+  \caption{Object Detection}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{监督学习（Supervised Classifiers）}
+  \begin{itemize}
+  \item 目标检测中的监督学习方法，指的是在样本集合中通过对不同视角下的目标的训练过程，学习得到不同目标视角下\{从输入到输出的映射函数\}。
+  \item 它是一个\{分类问题\}，在目标检测中，学习样本由\{目标特征\}对一个相关的目标类别组成。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{监督学习（Supervised Classifiers）}
+  \begin{itemize}
+  \item 一、特征选择
+  \item 二、学习算法（训练分类器）
+  \end{itemize}
+\end{frame}%监督学习
+
+\begin{frame}
+  \frametitle{一、特征选择}
+  \begin{itemize}
+  \item 一、特征选择
+  \item 特征选择是分类问题中的一个重要方面。
+  \item 图像特征最重要的属性是\{独特性\}，能够在特征空间内方便区分目标。
+  \item 特征可以是\{颜色\}、\{纹理\}、\{形状\}、\{轮廓\}等常用特征。
+  \item 也可以是\{目标区域\}、朝向、外观、\{概率密度\}、\{直方图\}等。
+  \item 可用于\{跟踪\}的特征有颜色、边缘、光流和纹理，或者是其中几种的组合。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{一、特征选择}
+  \begin{itemize}
+  \item 1.颜色特征
+  \item 2.纹理特征
+  \item 3.形状特征
+  \item 4.空间关系特征
+  \item 5.概率密度特征、直方图特征、梯度（变化率）特征等。
+  \item 6.边缘特征
+  \item 7.光流特征
+  \end{itemize}
+\end{frame}%特征分类
+
+\begin{frame}
+  \frametitle{一、特征选择}
+  \begin{itemize}
+  \item 1.颜色特征
+  \item 1.1颜色直方图
+  \item 1.2颜色集
+  \item 1.3颜色矩
+  \item 1.4颜色聚合向量
+  \item 1.5颜色相关图
+  \end{itemize}
+\end{frame}%颜色特征
+
+\begin{frame}
+  \frametitle{1.颜色特征}
+  \begin{itemize}
+  \item 1.1颜色直方图
+  \item 颜色直方图用以反映图像颜色的组成分布，即各种颜色出现的概率。
+  \item （1）RGB
+  \item （2）HSV
+  \item （3）HLS
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{1.颜色特征}
+  \begin{itemize}
+  \item 缺点：
+  \item （1）由于颜色直方图是全局颜色统计的结果，因此丢失了像素点间的位置特征。
+  \item （2）可能有几幅图像具有相同或相近的颜色直方图，但其图像像素位置分布完全不同。
+  \item （3）因此，图像与颜色直方图得多对一关系使得颜色直方图在识别\{前景物体\}上不能获得很好的效果。
+  \end{itemize}
+\end{frame}%颜色直方图
+
+\begin{frame}
+  \frametitle{1.颜色特征}
+  \begin{itemize}
+  \item 1.2颜色集
+  \item 颜色集的方法致力于实现基于颜色实现对大规模图像的检索。
+  \item 颜色集的方法首先将颜色转化到HSV颜色空间。  
+  \item 将图像根据其颜色信息进行图像分割成若干\{region\}，并将颜色分为多个\{bin\}，每个region进行颜色空间量化建立\{颜色索引\}，进而建立二进制图像颜色索引表。
+  \item 为加快查找速度，还可以构造\{二分查找树\}进行特征检索。
+  \end{itemize}
+\end{frame}%颜色集合（需改）
+
+\begin{frame}
+  \frametitle{1.颜色特征}
+  \begin{itemize}
+  \item 1.3颜色矩
+  \item 颜色矩是一种有效的颜色特征，该方法利用线性代数中矩的概念，将图像中的颜色分布\{用其矩表示\}。
+  \item 利用颜色一阶矩\{（平均值Average）\}、颜色二阶矩\{（方差 Variance）\}和颜色三阶矩\{（偏斜度Skewness）\}来描述颜色分布。
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{1.颜色特征}
+  \begin{itemize}
+  \item 1.4颜色聚合向量
+  \item 这个是对颜色直方图的一种比较聪明的改进。
+  \item 同样将颜色分成几个区间，不同的是在这不同的区间中，把每种颜色分成\{连接区域(coherent)\}和\{孤立 (incoherent)区域\}，分别统计这些区域的像素数，做对比时也是分别对比。
+   \item 这样，对直方图分类可以有改善，同样，根据这种思想也可以有很多的引申。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{1.颜色特征}
+  \begin{itemize}
+  \item 1.5颜色相关图
+  \item 其含义可简述为：与颜色值为i的像素距离 k的像素颜色值为j的\{概率\}。
+  \item 这种特征不但描述了某一种颜色的像素数量占整个图像的\{比例\}。
+  \item 还反映了不同颜色对之间的\{空间相关性\}。
+  \item 实验表明，颜色相关图比颜色直方图和颜色聚合向量具有\{更高的检索效率\}，特别是查询空间关系一致的图像。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{一、特征选择}
+  \begin{itemize}
+  \item 2.纹理特征
+  \item 纹理是检测物体表面\{intensity\}变化的手段，是对光滑程度和规则程度的量化。
+  \item 相对于颜色，它多了一个计算描述符的步骤，对于\{光照不敏感\}。
+  \item 一幅图像的纹理是在图像计算中经过\{量化\}的图像特征。
+  \item 图像纹理描述图像或其中小块区域的空间颜色分布和光强分布。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2.纹理特征}
+  \begin{itemize}
+  \item （一）特点：
+  \item 全局特征。
+  \item 仅仅利用纹理特征是无法获得高层次图像内容的。
+  \item 需要在包含多个像素点的区域中进行统计计算。
+  \item 不会由于局部的偏差而无法匹配成功。
+  \item 具有\{旋转不变性\}，并且对于噪声有较强的\{抵抗\}能力。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2.纹理特征}
+  \begin{itemize}
+  \item 纹理特征缺点:
+  \item （1）当图像的\{分辨率变化\}的时候，所计算出来的纹理可能会有较大偏差。
+  \item （2）由于有可能受到光照、反射情况的影响，从2-D图像中反映出来的纹理不一定是3-D物体表面\{真实的纹理\}。
+  \item （3）在检索具有粗细、疏密等方面较大差别的纹理图像时，利用纹理特征是一种有效的方法。
+  \item  但当纹理之间的粗细、疏密等易于分辨的信息之间\{相差不大\}的时候，通常的纹理特征很难准确地反映出人的视觉感觉不同的纹理之间的差别。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2.纹理特征}
+  \begin{itemize}
+  \item （二）常用的特征提取与匹配方法
+  \item 1.统计方法
+  \item 2.几何法
+  \item 3.模型法
+  \item 4.信号处理法
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2.纹理特征}
+  \begin{itemize}
+  \item 1.统计方法
+  \item（1）灰度共生矩阵
+  \item 灰度共生矩阵的四个关键特征：能量、惯量、熵和相关性。
+  \item 灰度共生矩阵定义为像素对的\{联合概率分布\}，是一个对称矩阵。
+  \item 它不仅反映图像灰度在相邻的方向、相邻间隔、变化幅度的综合信息，但也反映了相同的灰度级像素之间的位置分布特征，是计算纹理特征的基础。
+  \item（2）从图像的自相关函数（即图像的能量谱函数）提取纹理特征（即通过对图像的能量谱函数的计算，提取纹理的粗细度及方向性等特征参数）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2.纹理特征}
+  \begin{itemize}
+  \item 2.几何法
+  \item 是建立在纹理基元（基本的纹理元素）理论基础上的一种纹理特征分析方法。
+  \item 纹理基元理论认为，复杂的纹理可以由若干简单的纹理基元以一定的有规律的形式重复排列构成。
+  \item 比较有影响的算法有两种：（1）Voronio 棋盘格特征法（2）结构法。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2.纹理特征}
+  \begin{itemize}
+  \item 3.模型法
+  \item 以图像的构造模型为基础，采用模型的参数作为纹理特征。
+  \item 典型方法：（1）马尔可夫随机场模型法,
+（2）Gibbs 随机场模型法。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2.纹理特征}
+  \begin{itemize}
+  \item 4.信号处理法
+  \item 纹理特征的提取与匹配主要有：
+  \item （1）\{灰度共生矩阵\}特征提取与匹配主要依赖于能量、惯量、熵和相关性四个参数。
+  \item （2）\{Tamura纹理\}特征基于人类对纹理的\{视觉感知心理学\}研究，提出6种属性，即：粗糙度、对比度、方向度、线像度、规整度和粗略度。
+  \item （3）\{自回归纹理模型\}是马尔可夫随机场模型的一种应用实例。
+  \item （4）\{小波变换\}。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{一、特征选择}
+  \begin{itemize}
+  \item 3.形状特征
+  \item （一）特点：可以有效地利用图像中感兴趣的目标来进行检索。
+  \item  一些共同的问题:
+  \item （1）缺乏比较完善的\{数学模型\}。
+  \item （2）目标有\{变形\}时检索结果往往不太可靠。
+  \item （3）许多形状特征仅描述了目标局部的性质，要全面描述目标常对\{计算时间\}和\{存储量\}有较高的要求。
+  \item （4）许多形状特征所反映的目标形状信息与人的直观感觉不完全一致(特征空间的相似性与人视觉系统感受到的相似性有差别)。  
+  \item （5）从2-D图像中表现的3-D物体实际上只是物体在空间某一平面的投影，从2-D图像中反映出来的形状常不是3-D物体真实的形状，由于视点的变化，可能会产生各种\{失真\}。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{3.形状特征}
+  \begin{itemize}
+  \item （二）常用的特征提取与匹配方法
+  \item  1.几种典型的形状特征描述方法  
+  \item  通常情况下，形状特征有两类表示方法，一类是\{轮廓\}特征，另一类是\{区域\}特征。
+  \item  图像的轮廓特征主要针对物体的\{外边界\}，而图像的区域特征则关系到\{整个形状区域\}。
+  \item （1）边界特征法  
+  \item （2）傅里叶形状描述符法 
+  \item （3）几何参数法 
+  \item （4）形状不变矩法 
+  \item （5）其它方法  
+  \item  2.基于小波和相对矩的形状特征提取与匹配
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{3.形状特征}
+  \begin{itemize}
+  \item 1.边界特征法
+  \item 该方法通过对边界特征的描述来获取图像的形状参数。
+  \item 两个经典方法：
+  \item（1）Hough变换检测平行直线方法：利用图像全局特性而将\{边缘像素连接\}起来组成区域封闭边界，其基本思想是\{点—线的对偶性\}；
+  \item（2）边界方向直方图方法：首先微分图像求得图像边缘，然后做出关于边缘大小和方向的直方图，通常的方法是构造\{图像灰度梯度方向矩阵\}。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{3.形状特征}
+  \begin{itemize}
+  \item 2.傅里叶形状描述符法
+  \item 基本思想是用物体边界的傅里叶变换作为形状描述，利用区域边界的封闭性和周期性，将二维问题转化为一维问题。
+  \item 由边界点导出三种形状表达，分别是（1）曲率函数、（2）质心距离、（3）复坐标函数。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{3.形状特征}
+  \begin{itemize}
+  \item 3.几何参数法
+  \item 形状的表达和匹配采用更为简单的区域特征描述方法，例如采用\{有关形状定量测度\}（如矩、面积、周长等）的形状参数法（shape factor）。
+  \item QBIC（基于内容的图像检索系统）系统中，便是利用圆度、偏心率、主轴方向和代数不变矩等几何参数，进行基于形状特征的图像检索。
+  \item 形状参数的提取，必须以\{图像处理\}及\{图像分割\}为前提，参数的准确性必然受到分割效果的影响，对分割效果很差的图像，形状参数甚至无法提取。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{3.形状特征}
+  \begin{itemize}
+  \item 4.形状不变矩法
+  \item 利用目标所占区域的\{矩\}作为形状描述参数。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{3.形状特征}
+  \begin{itemize}
+  \item 5.其它方法:
+  \item （1）有限元法。
+  \item （2）旋转函数。
+  \item （3）小波描述符。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{3.形状特征}
+  \begin{itemize}
+  \item 2.基于小波和相对矩的形状特征提取与匹配：
+  \item 先用小波变换模极大值得到\{多尺度边缘图像\}。
+  \item 计算每一尺度的 7个不变矩，再转化为 10 个相对矩。
+  \item 然后将所有尺度上的相对矩作为\{图像特征向量\}，从而统一了区域和封闭、不封闭结构。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{一、特征选择}
+  \begin{itemize}
+  \item 4.空间关系特征
+  \item （一）特点：
+  \item 所谓空间关系，是指图像中分割出来的多个目标之间的相互的空间位置或相对方向关系，这些关系也可分为连接/邻接关系、交叠/重叠关系和包含/包容关系等。
+  \item 相对空间位置信息\&绝对空间位置信息。
+  \item 空间关系特征的使用可加强对图像内容的描述区分能力，但空间关系特征常\{对图像或目标的旋转、反转、尺度变化等比较敏感\}。
+  \item 另外，实际应用中，仅仅利用空间信息往往是不够的，不能有效准确地表达场景信息。为了检索，除使用空间关系特征外，还\{需要其它特征来配合\}。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{4.空间关系特征}
+  \begin{itemize}
+  \item （二）常用的提取图像空间关系特征方法：
+  \item （1）首先对图像进行自动分割，划分出图像中所包含的对象或颜色区域，然后根据这些区域提取图像特征，并建立索引。
+  \item （2）简单地将图像均匀地划分为若干规则子块，然后对每个图像子块提取特征，并建立索引。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{一、特征选择}
+  \begin{itemize}
+  \item 5.概率密度特征、直方图特征、梯度（变化率）特征等。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{一、特征选择}
+  \begin{itemize}
+  \item 6.边缘特征
+  \item 边缘通常伴随着剧烈的\{intensity\}变化。
+  \item 对比于颜色特征，边缘特征\{对光照变化不敏感\}。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{监督学习}  
+  \begin{itemize}
+  \item 1.微分算子法
+  \item（1）Sobel算子 
+  \item（2）robert算子
+  \item（3）prewitt算子
+  \item 2.Laplacian算子
+  \item 3.Canny边缘检测法（\{最流行的边缘检测算法\}）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{一、特征选择}
+  \begin{itemize}
+  \item 7.光流
+  \item 光流特征是定义区域内每个像素变化的\{稠密位移向量域\}。通过计算区域内的\{光照对比度变化\}得到。通常应用在\{基于运动的分割和跟踪\}上。
+  \item（1）基于梯度的方法
+  \item（2）基于匹配的方法
+  \item（3）基于能量的方法 
+  \item（4）基于相位的方法
+  \item（5）神经动力学方法
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{一、特征选择}
+  \begin{itemize}
+  \item 如果是视频文件的话，还有基于运动的特征提取算法。
+  \item 以上各种算法都有自己的优缺点，适用场合也不尽相同，通常需要多个特征\{组合\}在一起才能得到比较好的结果。
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{监督学习}
+  \begin{itemize}
+  \item 二、学习算法（训练分类器）
+  \item 选择特定特征之后，采用合适的学习\{算法\}来训练\{分类器\}。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{二、学习算法（训练分类器）}
+  \begin{itemize}
+  \item 1.Boosting
+  \item 2.SVM(支持向量机)
+  \item 3.神经网络
+  \item 4.决策树
+  \item 5.贝叶斯
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{二、学习算法（训练分类器）}
+  \begin{itemize}
+  \item 1.Boosting
+  \item Adaptive Boosting
+  \item 通过一些低精度的分类器\{组合迭代\}\{调整权重\}以找到高精度分类器的一种方法。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{二、学习算法（训练分类器）}
+  \begin{itemize}
+  \item 2.SVM(支持向量机) 
+  \item 是一种\{二分类模型\}。
+  \item 其基本模型定义为特征空间上的间隔最大的线性分类器（即学习支持向量机的策略便是\{间隔最大化\}）。
+  \item 最终可转化为一个凸二次规划问题的求解。
+  \item \{LinearSVM\}（程明明 BING）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{二、学习算法（训练分类器）}
+  \begin{itemize}
+  \item 3.神经网络
+  \item 是一种模仿生物神经网络的结构和功能的数学模型。 
+  \item 是一种非线性统计数据建模工具。 
+  \item 常用来对输入和输出间的关系进行建模，或用来探索数据的模式。
+  \item 其一个比较贴切的定义是：\{人工神经网络是由人工建立的以有向图为拓扑结构的动态系统，它通过对连续或断续的输入作状态响应而进行信息处理\}。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{二、学习算法（训练分类器）}
+  \begin{itemize}
+  \item 4. 决策树
+  \item 决策树是由一个\{决策图\}和\{可能的结果\}组成，用来创建到达目标的规划。  
+  \item 建立并用来辅助决策，是一种特殊的树结构。 
+  \item 是一个\{预测模型\}，他代表的对象属性和对象值之间的一种映射关系。 
+  \item 树中每个\{结点\}表示某个对象，而每个\{分叉路径\}则代表某个可能的属性值。  
+  \item 数据挖掘中决策树是一种经常要用到的技术，可以用于分析数据，也可以用来预测。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{二、学习算法（训练分类器）}
+  \begin{itemize}
+  \item 5.贝叶斯
+  \item 朴素贝叶斯是贝叶斯决策理论的一部分，贝叶斯理论的核心思想是\{为数据选择高概率的类别\}。
+  \item 而朴素贝叶斯之所以"朴素",是因为这个形式化过程只做最原始，最简单的假设。
+  \end{itemize}
+\end{frame}%监督学习
+
+\begin{frame}
+  \frametitle{监督学习}  
+  \begin{itemize}
+  \item 部分热点：
+  \item（1）BING（BING是NG的二进制版本，加快速度）
+  \item（2）NG（梯度绝对值：相邻像素颜色相减的绝对值）
+  \item（3）DPM（HOG的进化版）
+  \item（4）HOG（方向梯度直方图）（轮廓特征明显）
+  \item（5）LBP（局部二值模式）（纹理特征明显）
+  \item LBP局部纹理提取算子，已经成功应用在指纹识别、字符识别、人脸识别、车牌识别等领域。
+  \item（6）Haar-like（纹理特征明显）\\
+Haar特征分为三类：（1）边缘特征（2）线性特征（3）中心特征和对角线特征。以上三类组合成特征模板。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{监督学习}  
+  \begin{itemize}
+  \item 较为成功的目标检测算法：
+  \item（1）检测行人：HOG+SVM
+  \item（2）检测人脸：Haar+AdaBoost
+  \item（3）检测指纹：LBP+ AdaBoost
+  \end{itemize}
+\end{frame}%热点
+
+\section{conclusion}
+
+\begin{frame}
+  \frametitle{conclusion}  
+  \begin{figure}[!ht]
+  \centering\includegraphics[width=3.5in]{f.JPG}
+  \caption{conclusion}
+  \end{figure}
+\end{frame}%目标检测定义
+
+\section{运动目标检测}
+
+\begin{frame}
+  \frametitle{运动目标检测}  
+  \begin{itemize}
+  \item 运动目标检测：
+  \item 一、静态背景下的目标检测
+  \item 二、运动背景下的目标检测
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{运动目标检测}  
+  \begin{itemize}
+  \item 静态背景下的目标检测：
+  \item 1.背景差分法(背景消除法)
+  \item 2.多形态混合统计模型
+  \item 3.帧间差分法
+  \item 4.光流法
+  \item 5.平均背景法
+  \item 6.码本（codebook）
+  \item 7.边缘检测法
+  \item 8.运动矢量检测法
+  \item 9.将图像表达为离散事件状态
+  \item 10.特征空间分解方法
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{运动目标检测}  
+  \begin{itemize}
+  \item 1.背景差分法(背景消除法)
+  \item （1）中值法背景建模（直方图法） 
+  \item （2）均值法背景建模
+  \item （3）卡尔慢滤波器模型
+  \item （4）单高斯分布模型
+  \item （5）多高斯分布模型
+  \item （6）高级背景模型
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{运动目标检测}  
+  \begin{itemize}
+  \item 2.多形态混合统计模型
+  \item （1）混合高斯模型（GMM）（可归为背景差分法）
+  \item （2）非参数核密度估计
+  \item （3）纹理颜色特征融合
+  \item （4）分层模型
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{运动目标检测}  
+  \begin{itemize}
+  \item 4.光流法
+  \item （1）基于梯度的方法
+  \item （2）基于匹配的方法
+  \item （3）基于能量的方法 
+  \item （4）基于相位的方法
+  \item （5）神经动力学方法
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{运动目标检测}  
+  \begin{itemize}
+  \item 7.边缘检测法
+  \item 7.1 微分算子法
+  \item（1）Sobel算子
+  \item（2）robert算子
+  \item（3）prewitt算子
+  \item 7.2 Laplacian算子
+  \item 7.3 Canny边缘检测法
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{运动目标检测}  
+  \begin{itemize}
+  \item 运动背景下的目标检测：
+  \item 1.块匹配（BMA）
+  \item 2.光流估计
+  \item 3.像素递归算法（PRA）
+  \item 4.自回归运动平均过程(ARMA)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{运动目标检测}  
+  \begin{itemize}
+  \item 1.块匹配（BMA）
+  \item（1）穷尽搜索法（Exhaustive Search）ES
+  \item（2）三步法（Three Step Search）TSS
+  \item（3）新三步法（New Three Step Search） NTSS
+  \item（4）精简三步法（Simple and Efficient Search） SES
+  \item（5）四步法（Four Step Search) FSS
+  \item（6）菱形法（Diamond Search） DS
+  \item（7）自适应法（Adaptive Rood Pattern Search） ARPS
+  \end{itemize}
+\end{frame}%运动目标检测
+
+\section{objectness proposal}
+
+\begin{frame} 
+  \frametitle{objectness proposal}
+  \begin{itemize}
+  \item 2010 CVPR:What is an object?journal version published in IEEE TPAMI 2012
+  \item 2010 ECCV:Category Independent Object Proposals,journal version published in IEEE TPAMI 2014.
+  \item 2011 CVPR:Proposal Generation for Object Detection using Cascaded Ranking SVMs
+  \item 2011 ICCV:Segmentation as selective search for object recognition,journal version published in IJCV 2013.
+  \item 2014 CVPR:BING: Binarized Normed Gradients for Objectness Estimation at 300fps
+  \end{itemize}
+\end{frame}%objectness
+
+\begin{frame} 
+  \frametitle{objectness proposal}
+That's all,thank you very much!
+\end{frame}
+
+
+\end{document}
+
+
+
+
