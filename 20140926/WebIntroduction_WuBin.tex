@@ -1,0 +1,250 @@
+\documentclass[notheorems,mathserif,table,compress]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{comment}
+\usepackage{fancybox}
+%添加代码显示宏包
+\usepackage{listings,framed,xcolor}
+\definecolor{lgray}{rgb}{0.95,0.95,0.95}
+\lstset{
+	basicstyle=\tt,
+	numbers=left,
+	stepnumber=1,
+	frame=L,
+	language=HTML,
+	columns=fullflexible,
+	breaklines=true,
+	keywordstyle=\color{blue},
+	backgroundcolor=\color{lgray},
+	stringstyle=\color{red}
+	}
+ 
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+% \usecolortheme[<options>]{<name list>}
+%% Font Themes
+% \usefonttheme[<options>]{<name>}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+\begin{comment}
+\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+  \frame<handout:0>{
+    \frametitle{Content}\small
+    \tableofcontents[current,currentsubsection]
+  }
+}
+\AtBeginSubsection[]                            % 在每个子段落之前
+{
+  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+  {
+    \frametitle{下一节内容}\small
+    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+  }
+}
+\end{comment}
+%%----------------------------------------------------------
+\title[Web Introduction]{Web Introduction}
+\author[WU Bin]{\textcolor{olive}{Wu Bin}}
+  %\hspace{2.28em}导师~~\textcolor{olive}{姬光荣}~教授}
+\institute[Ocean University of China]{\small\textcolor{violet}{Ocean University of China}}
+\date{2014.9.25}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{目录}
+\frame{\frametitle{content}\tableofcontents}
+%%----------------------------------------------------------
+
+%\section{Beamer类和XeTeX概览} %如果你想书签不出现问题,请不要用\XeTeX
+                                 %这类复杂的指令,直接写XeTeX吧
+\section{Website \& Webpage}
+\begin{frame}
+ \frametitle{Website}
+ 	 \begin{itemize}
+	 \item 操作系统
+	 \item 通过互联网或者局域网访问. 
+	 \item 通过浏览器展示.
+	 \item 一系列网页的集合.
+	 \end{itemize}
+\end{frame}
+\begin{frame}
+ \frametitle{Webpage}
+~~~~~~网页（英语：Web page）是一个文件，他存放在世界某个角落的某一部或一组计算机中，而这部计算机必须是与互联网相连的。网页经由网址（URL）来识别与访问，当我们在网页浏览器输入网址后，经过一段复杂而又快速的程序，网页文件会被传送到用家的计算机，然后再通过浏览器解释网页的内容，再展示到你的眼前。是互联网中的一“页”，通常是HTML格式（文件扩展名为.html或.htm），但现今已有愈来愈多、各色各样的网页格式和标准出现。
+\end{frame}
+
+
+\section{Basic Language}
+\begin{frame}
+ \frametitle{HTML}
+ HTML 是用来描述网页的一种语言
+ 	\begin{itemize}
+ 	\item HTML 指的是超文本标记语言 (Hyper Text Markup Language).
+ 	\item HTML 不是一种编程语言，而是一种标记语言 (markup language).
+ 	\item 标记语言是一套标记标签 (markup tag).
+ 	\item HTML 使用标记标签来描述网页.
+ 	\end{itemize}
+\end{frame}
+\begin{frame}
+ \frametitle{HTML一般格式}
+ 	\lstinputlisting{figures/001.html}
+\end{frame}
+\begin{frame}
+\frametitle{HTML界面}
+ 	\begin{figure}[!ht]
+	\centering\includegraphics[width=3in]{001.jpg}
+	\end{figure}
+\end{frame}
+\begin{frame}
+\frametitle{DIV}
+ 	HTML <div> 元素\\
+HTML <div> 元素是块级元素，它是可用于组合其他 HTML 元素的容器。\\
+<div> 元素没有特定的含义。除此之外，由于它属于块级元素，浏览器会在其前后显示折行。\\
+如果与 CSS 一同使用，<div> 元素可用于对大的内容块设置样式属性。\\
+<div> 元素的另一个常见的用途是文档布局。它取代了使用表格定义布局的老式方法。
+\end{frame}
+
+\begin{frame}
+ \frametitle{CSS}
+ 	\begin{itemize}
+ 	\item CSS 指层叠样式表 (Cascading Style Sheets).
+ 	\item 样式定义如何显示 HTML 元素.
+ 	\item 样式通常存储在样式表中.
+ 	\item 外部样式表可以极大提高工作效率.
+	\item 外部样式表通常存储在 CSS 文件中.
+ 	\end{itemize}
+\end{frame}
+\begin{frame}
+ \frametitle{CSS一般格式}
+ 	\lstinputlisting{figures/002.html}
+ \end{frame}
+ \begin{frame}
+ \frametitle{CSS一般格式}
+ 	\lstinputlisting{figures/003.html}
+ \end{frame}
+ \begin{frame}
+ \frametitle{CSS界面}
+ 	\begin{figure}[!ht]
+	\centering\includegraphics[width=3in]{002.jpg}
+	\end{figure}
+ \end{frame}
+\begin{frame}
+ \frametitle{JavaScript}
+~~~~~~JavaScript 是世界上最流行的编程语言。\\
+~~~~~~这门语言可用于 HTML 和 web，更可广泛用于服务器、PC、笔记本电脑、平板电脑和智能手机等设备。
+\begin{itemize}
+ 	\item JavaScript 是脚本语言.
+ 	\item JavaScript 是一种轻量级的编程语言.
+ 	\item JavaScript 是可插入 HTML 页面的编程代码.
+ 	\item JavaScript 插入 HTML 页面后，可由所有的现代浏览器执行.
+	\item JavaScript 很容易学习.
+ 	\end{itemize}
+\end{frame}
+\begin{frame}
+\frametitle{JavaScript一般格式}
+ 	\lstinputlisting{figures/004.html}
+\end{frame}
+ \begin{frame}
+ \frametitle{JavaScript界面}
+ 	\begin{figure}[!ht]
+	\centering\includegraphics[width=3in]{004.jpg}
+	\end{figure}
+\end{frame}
+\begin{frame}
+\frametitle{PHP}
+ 	PHP 是一种创建动态交互性站点的强有力的服务器端脚本语言。\\
+PHP 是免费的，并且使用广泛。对于像微软 ASP 这样的竞争者来说，PHP 无疑是另一种高效率的选项。
+\end{frame}
+\begin{frame}
+\frametitle{PHP一般格式}
+ 	\lstinputlisting{figures/005.html}
+\end{frame}
+ \begin{frame}
+ \frametitle{PHP界面}
+ 	\begin{figure}[!ht]
+	\centering\includegraphics[width=3in]{005.jpg}
+	\end{figure}
+\end{frame}
+
+\section{How to build a website}
+\begin{frame}
+ \frametitle{LAMP}
+~~~~~~LAMP是指一组通常一起使用来运行动态网站或者服务器的自由软件名称首字母缩写：
+	\begin{itemize}
+ 	\item Linux，操作系统
+ 	\item Apache，网页服务器
+	\item MariaDB或MySQL，数据库管理系统（或者数据库服务器）
+	\item PHP、Perl或Python，脚本语言
+ 	\end{itemize}
+\end{frame}
+\begin{frame}
+ \frametitle{Apache}
+ ~~~~~~Apache HTTP Server（简称Apache）是Apache软件基金会的一个开放源代码的网页服务器，可以在大多数电脑操作系统中运行，由于其跨平台和安全性。被广泛使用，是最流行的Web服务器端软件之一。它快速、可靠并且可通过简单的API扩充，将Perl/Python等解释器编译到服务器中。\end{frame}
+
+\section{Famous tools or modules}
+\begin{frame}
+ \frametitle{Wordpress}
+ ~~~~~~WordPress是一个以PHP和MySQL为平台的自由开源的博客软件和内容管理系统。WordPress具有插件架构和模板系统。Alexa排行“前100万”的网站中有超过16.7\%的网站使用WordPress。到了2011年8月，约22\%的新网站采用了WordPress。WordPress是目前因特网上最流行的博客系统。
+\end{frame}
+\begin{frame}
+ \frametitle{ThinkPHP}
+~~~~~~ThinkPHP 是一个免费开源的，快速、简单的面向对象的 轻量级PHP开发框架，遵循Apache2开源协议发布，是为了敏捷WEB应用开发和简化企业应用开发而诞生的。\\
+~~~~~~ThinkPHP可以支持windows/Unix/Liunx等服务器环境，正式版需要PHP5.0以上版本支持，支持MySql、PgSQL、Sqlite以及PDO等多种数据库，ThinkPHP框架本身没有什么特别模块要求，具体的应用系统运行环境要求视开发所涉及的模块。
+\end{frame}
+\begin{frame}
+ \frametitle{参考资料}
+ 	\begin{itemize}
+ 	\item W3cschool - www.w3cschool.com.cn
+ 	\item 兄弟连教育 - http://www.lampbrother.net/
+ 	\end{itemize}
+\end{frame}
+
+\section{My test webpage}
+\begin{frame}
+ \frametitle{CVBI Homepage}
+ 	\begin{figure}[!ht]
+	\centering\includegraphics[width=3in]{cvbi.jpg}
+	\end{figure}
+\end{frame}
+\begin{frame}
+ \frametitle{Scallop Genome}
+ 	\begin{figure}[!ht]
+	\centering\includegraphics[width=4in]{sb.jpg}
+	\end{figure}
+\end{frame}
+
+
+
+
+\end{document}
