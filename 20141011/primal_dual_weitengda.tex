@@ -143,7 +143,17 @@ y_1,y_2,y_3\ge 0
 \begin{equation}
 \min_u \int_{\Omega}(\alpha|\nabla u|+\frac{1}{2}(Ku-z)^2)dxdy
 \end{equation}
-其中
+其对应的欧拉-拉格朗日方程为：
+\begin{equation}
+-\alpha \nabla(\frac{\nabla u}{|\nabla u|})+K^*(Ku-z)=0
+\end{equation}
+可以看出$|\nabla u|$出现在分母上一般很难线性化，并且可能出现分母等于零的情况。我觉得作者引入$\omega$的初衷不是想到了原始-对偶问题，而是想要消除此处的奇异性，用$\omega$表示奇异部分$\cfrac{\nabla u}{|\nabla|}$，如此变换（9）转化为：
+\begin{equation}
+-\alpha \nabla \omega+K^*(Ku-z)=0
+\end{equation}
+而$\omega=\cfrac{\nabla u}{|\nabla|}$可转化为（16）式，奇异性消除，而原始-对偶问题是为了合理地解释这种变换引入的。（这只是我的猜想，嘿嘿）
+
+对于（8）式来说，
 \begin{eqnarray}
 &&\int_{\Omega}|\nabla u|dxdy\\
 &=&\int_{\Omega}\frac{\nabla u\nabla u}{|\nabla u|}dxdy\\
