@@ -1,0 +1,388 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{styles/iplouccfg}
+\usepackage{styles/zhfontcfg}
+\usepackage{styles/iplouclistings}
+\usepackage{cite}
+
+\title{原始-对偶问题}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+\section{原始-对偶问题的发展与应用}
+\subsection{理论发展}
+在线性规划早期发展中最重要的发现就是对偶问题，即每一个线性规划问题(称为原始问题)都有一个与它对应的对偶线性规划问题（称为对偶问题）。
+对偶问题的发展：
+\begin{itemize}
+\item 1928年美籍匈牙利数学家 J.von诺伊曼在研究对策论时已发现线性规划与对策论之间存在着密切的联系。两零和对策可表达成线性规划的原始问题和对偶问题
+\item 1947年提出对偶理论
+\item 1951年G.B.丹齐克引用对偶理论求解线性规划的运输问题，研究出确定检验数的位势法原理
+\item 1954年C.莱姆基提出对偶单纯形法
+\end{itemize}
+原始-对偶方法在对偶理论的基础上逐渐发展起来。
+原始-对偶方法的发展：
+\begin{itemize}
+\item 1987年Megiddo提出原始-对偶算法（\cite{NM}）
+\item 1992年Mehrotra提出了求解线性规划的适应算法（\cite{SM}）
+\item 1994年Nesterov、Nemirovskii把解线性规划的相关理论推广到了凸规划、半定规划及二阶锥规划上（\cite{NN}）
+\item 1997年Nesterov和Todd把原始对偶算法推广到一个受限制的凸问题上（\cite{NT}）
+\end{itemize}
+原始-对偶问题的理论发展比较成熟，并且具有较好的性质、结论，并能应用到很多涉及最值的问题，故其应用越来越广泛。
+
+\subsection{经济中的应用}
+对偶理论主要研究经济学中的相互确定关系，涉及到经济学的诸多方面。产出与成本的对偶、效用与支出的对偶，是经济学中典型的对偶关系。经济系统中还有许多其他这样的对偶关系。关于原始-对偶问题在经济学的应用不再一一赘述。
+\subsection{图像中原始-对偶问题的应用}
+在图像去噪的最小化问题中，目标函数不可微，其对应的欧拉-拉格朗日方程很难求解，像牛顿法之类的高阶方法无法应用，而原始-对偶方法在处理最小化问题时得到了很好的效果，但其也有缺陷，如数值求解问题、求解原始-对偶向量的额外花费等。
+
+原始-对偶问题在图像中的应用是PDE图像处理中一个较为崭新的思想，最早是1999年Chan、Golub、Mulet在《A nonlinear primal-dual method for variation-based image restoration》中考虑图像复原中的经典的最小化问题的对偶问题，自此之后，原始-对偶问题广泛的与其他方法结合被应用到图像处理中。
+几个成功的原始-对偶方法：
+\begin{itemize}
+\item CGM原始-对偶方法
+\item Chambolle对偶方法
+\begin{eqnarray}
+&&\inf_{u}{\frac{1}{2}\int_{\Omega}(Ku-f)^2dx+\lambda\int_{\Omega}|\bigtriangleup u|}
+\\
+&\Leftrightarrow&\inf_{u}\sup_{|p|\le 1}{\frac{1}{2}\int_{\Omega}(Ku-f)^2dx+\lambda\int_{\Omega}u divpdx}
+\\
+&\Leftrightarrow&\sup_{|p|\le 1}\inf_u{\frac{1}{2}\int_\Omega(Ku-f)^2+\lambda \int_\Omega u divp dx}
+\\
+&\Leftrightarrow&\sup_{|p|\le 1}{-\frac{\lambda^2}{2}\int_\Omega|K^{-T}\textrm{div} p-\frac{f}{\lambda}|^2dx}
+\end{eqnarray}
+
+\item 半平滑牛顿法
+\item 原始对偶有效集方法
+\item 原始对偶混合梯度方法
+\end{itemize}
+
+
+原始-对偶问题在解决规划问题时具有较好的性质，所以被广泛应用在图像处理中的很多方面，如：
+\begin{itemize}
+\item 原始-对偶与L-1 TV图像复原结合（\cite{DHN}）
+\item 原始-对偶与小波图像修复结合（\cite{WCY}）
+\item 原始-对偶与Bregman迭代结合（\cite{ZBO}）
+\end{itemize}
+
+\section{对偶空间}
+为了有助于原始-对偶问题的理解，首先介绍两个概念：对偶空间、原始-对偶向量。
+维基百科(\cite{wiki})对对偶空间是这样叙述的：对偶空间构造是行向量$(1×n)$与列向量$(n×1)$的关系的抽象化。
+
+代数的对偶空间:设$V$为在域$F$上的向量空间，定义其对偶空间$V^*$为由$V$到$F$的所有线性函数的集合。即是$V$的标量线性变换。$V^*$本身是$F$的向量空间并且拥有加法及标量乘法：
+\begin{equation}
+\begin{array}{c}
+(\phi+\varphi)(x)=\phi(x)+\varphi(x)
+\\
+(a\phi)(x)=a\phi(x)
+\end{array}
+\end{equation}
+$\forall \phi , \varphi \in V^*$,$\forall a \in F$,$\forall x \in V$。
+可以看出，原始与对偶可能存在一定的互逆变化之意。
+\section{原始-对偶向量}
+定义(\cite{weifenjihe})：设$V$是$R$上的有限维矢量空间。线性映射$\omega$:$V\to R$称为$V$上的对偶矢量。
+\\
+例：设$V$为全体$2\times 1$实矩阵的集合，则它在矩阵加法和数乘规则下构成2维矢量空间。以$\omega$代表任一$1\times2$实矩阵$(c,d)$，其对$V$的任一元素$v=\left(\begin{array}{l}a\\b\end{array}\right)$的作用可用矩阵乘法定义：$\omega(v)=（c,d）\left(\begin{array}{l}a\\b\end{array}\right)$。这样$\omega$即是$V$上的对偶矢量。
+\section{原始-对偶问题}
+例：某厂生产甲乙两种产品，其所需资源和单位价格如下表所示：
+\begin{center}
+\begin{tabular}{|r|r|r|r|} 
+\hline
+资源限量&甲&乙&资源总数\\
+\hline
+煤&9&4&360\\
+\hline
+电&4&5&200\\
+\hline
+油&3&10&300\\
+\hline
+单位价格&7&12&*\\
+\hline
+\end{tabular}
+\end{center} 
+考虑如何决定生产方案，使总收入最大？设生产甲、乙产品的产量分别为$x_1,x_2$：
+\begin{equation}
+\begin{array}{l}
+\max \quad z=7x_1+12x_2
+\\
+s.t. \quad
+\begin{array}{l}
+9x_1+4x_2\le 360\\
+4x_1+5x_2\le 200\\
+3x_1+10x_2\le 300\\
+x_1,x_2\ge 0
+\end{array}
+\end{array}
+\end{equation}
+假设生产单位不再自己生产产品，而是将全部资源出卖，问购买方如何购买价格，双方才能成交？
+\\
+设煤、油、电的购买单价为$y_1,y_2,y_3$:
+\begin{equation}
+\begin{array}{l}
+min \quad \omega=360y_1+200y_2+300y_3
+\\
+s.t. \quad
+\begin{array}{l}
+9y_1+4y_2+3y_3\ge 7\\
+4y_1+5y_2+10y_3\ge 12\\
+y_1,y_2,y_3\ge 0
+\end{array}
+\end{array}
+\end{equation}
+对偶问题与原始问题之间存在着下列关系：
+\begin{itemize}
+\item目标函数对原始问题是极大化，对对偶问题则是极小化。
+\item原始问题目标函数中的收益系数是对偶问题约束不等式中的右端常数，而原始问题约束不等式中的右端常数则是对偶问题中目标函数的收益系数。
+\item原始问题和对偶问题的约束不等式的符号方向相反。
+\item原始问题约束不等式系数矩阵转置后即为对偶问题的约束不等式的系数矩阵。
+\item原始问题的约束方程数对应于对偶问题的变量数，而原始问题的变量数对应于对偶问题的约束方程数。
+\item对偶问题的对偶问题是原始问题，这一性质被称为原始和对偶问题的对称性。
+\end{itemize}
+由此可见，原始问题和对偶问题一个是取最大，一个是取最小，并且如果原始问题有最优解，对偶问题也有最优解，且最优值相等。
+\section{论文中原始-对偶问题}
+在《A NONLINEAR PRIMAL-DUAL METHED FOR TOTAL VARIATION-BASED IMAGE RESTORATION》中原始问题:
+\begin{equation}
+\min_u \int_{\Omega}(\alpha|\nabla u|+\frac{1}{2}(Ku-z)^2)dxdy
+\end{equation}
+其对应的欧拉-拉格朗日方程为：
+\begin{equation}
+-\alpha \nabla(\frac{\nabla u}{|\nabla u|})+K^*(Ku-z)=0
+\end{equation}
+可以看出$|\nabla u|$出现在分母上一般很难线性化，并且可能出现分母等于零的情况。我觉得作者引入$\omega$的初衷不是想到了原始-对偶问题，而是想要消除此处的奇异性，用$\omega$表示奇异部分$\cfrac{\nabla u}{|\nabla|}$，如此变换（9）转化为：
+\begin{equation}
+-\alpha \nabla \omega+K^*(Ku-z)=0
+\end{equation}
+而$\omega=\cfrac{\nabla u}{|\nabla|}$可转化为（16）式，奇异性消除，而原始-对偶问题是为了合理地解释这种变换引入的。（这只是我的猜想，嘿嘿）
+
+对于（8）式来说，
+\begin{eqnarray}
+&&\int_{\Omega}|\nabla u|dxdy\\
+&=&\int_{\Omega}\frac{\nabla u\nabla u}{|\nabla u|}dxdy\\
+&=&\sup_{|\omega|\le 1}\int_{\Omega}\nabla u \omega dxdy\\
+&=&\sup_{|\omega|\le 1}\{\int_{\partial\Omega}\frac{\partial u}{\partial n} \omega dxdy-\int_{\Omega}u \textrm{div}\omega dxdy\}\\
+&=&\sup \{-\int_{\Omega}u\nabla \omega dxdy:\omega \in(C^{\infty}_0(\Omega))^2,\parallel \omega \parallel \le 1\}
+\end{eqnarray}
+且$\omega$满足：
+\begin{equation}
+|\nabla u|\omega-\nabla u=0
+\end{equation}
+(此处值得思考)。$\omega$把$u$映射为一个数，故$\omega$为对偶向量。
+引入$\omega$后，原始问题可表示为：
+\begin{equation}
+\min_u \sup_{\parallel \omega \parallel \le 1}\Phi(u,\omega)
+\end{equation}
+其中
+\begin{equation}
+\Phi(u,\omega)=\int_{\Omega}(-\alpha u \nabla \omega+\frac{1}{2}(Ku-z)^2)dxdy
+\end{equation}
+在凸分析中提到$\Phi(u,\omega)$有马鞍点，故：
+\begin{equation}
+\min_u \sup_{\parallel \omega \parallel \le 1}\Phi(u,\omega)=\sup_{\parallel \omega \parallel \le 1}\min_u \Phi(u,\omega)
+\end{equation}
+结合上图理解上述过程。
+\begin{figure}
+ \includegraphics[width=\linewidth]{saddle}
+\end{figure}
+
+由此将原始问题转化为关于对偶向量$\omega$的对偶问题：
+\begin{equation}
+\sup_{\parallel \omega \parallel \le 1} \Psi(\omega)
+\end{equation}
+其中$\Psi(\omega)=\min_u \Phi(u,\omega)$
+\newline
+\newline
+\section{牛顿法}
+\subsection{对偶理论中的牛顿法}
+原始问题：$\{\min  c^{T}x;Ax=b, x\ge 0\}$和对偶问题$\{\max b^{T}\lambda;A^{T}+s=c, s\ge 0\}$等价于下述问题：
+\begin{equation}
+\begin{array}{c}
+A^{T}\lambda+s=c\\
+Ax=b\\
+x_is_i=0\\
+(x,s)\ge 0
+\end{array}
+\end{equation}
+用$F(x,\lambda,s)$来表示最优条件（11）：
+\begin{equation}
+\left[
+\begin{array}{c}
+A^{T}\lambda+s-c\\
+Ax-b\\
+x_is_i\\
+\end{array}
+\right]
+=0
+\end{equation}
+在迭代求解时要确定前进方向。牛顿法在当前一步附近形成一个线性模型，获得前进方向。它是通过解决下列线性方程来实现的：
+\begin{equation}
+J(x,\lambda,s)
+\left[
+\begin{array}{c}
+\bigtriangleup x\\
+\bigtriangleup \lambda\\
+\bigtriangleup s
+\end{array}
+\right]
+=
+-F(x,\lambda,s)
+\end{equation}
+其中$J$为$F$的雅可比矩阵。
+\begin{equation}
+J=
+\left[
+\begin{array}{ccc}
+0 & A^T & I\\
+A & 0 & 0\\
+S & 0 & X
+\end{array}
+\right]
+\end{equation}
+\subsection{论文中的牛顿法}
+由第五章已知，最原始的问题（4）等价解决关于$u$和$\omega$的原始-对偶问题，即解决欧拉-拉格朗日方程：
+\begin{equation}
+\begin{array}{c}
+-\alpha \bigtriangledown \omega +K^*(Ku-z)=0\\
+\omega \sqrt{|\bigtriangledown u|^2+\beta}-\bigtriangledown u=0
+\end{array}
+\end{equation}
+记
+\begin{equation}
+F(u,\omega)=
+\left[
+\begin{array}{c}
+-\alpha \bigtriangledown \omega +K^*(Ku-z)\\
+\omega \sqrt{|\bigtriangledown u|^2+\beta}-\bigtriangledown u
+\end{array}
+\right]
+\end{equation}
+在推导$F$的雅可比矩阵前，先借助方向导数的概念来理解$F$的雅可比矩阵求法。
+函数$f$在点$x$处沿向量$a$的方向导数为:
+\begin{equation}
+D_af(x)=\lim_{\tau \to 0} \frac{f(x+\tau a)-f(x)}{\tau}
+\end{equation}
+如在（14）中的$A^T$可由方向导数推导而来，
+\begin{equation}
+D_\lambda J_1=\lim_{\tau \to 0} \frac{A^T(\hat{\lambda}+\tau \lambda)+s-c-(A^T\hat{\lambda}+s-c)}{\tau}=A^T \lambda
+\end{equation}
+对于论文中提到的雅可比矩阵，$u$是关于$x$、$y$的函数，当求$u$的偏导数时要涉及泛函导数的概念：
+对任何测试函数$f$，$F$关于$\varphi$的导数$\cfrac{\delta F(\varphi)}{\delta \varphi}$满足：
+\begin{equation}
+\left(
+\frac{\delta F(\varphi)}{\delta \varphi},f
+\right)
+=\lim_{\tau \to 0}\frac{F(\varphi+\tau f)-F(\varphi)}{\tau}
+\end{equation}
+下面分别推导$F$的雅可比矩阵的四项：
+记$f_1=-\alpha \bigtriangledown \omega +K^*(Ku-z)$、$f_2=\omega \sqrt{|\bigtriangledown u|^2+\beta}-\bigtriangledown u$,用$\hat{u}$、$\hat{\omega}$表示任意测试函数。
+\begin{eqnarray}
+\left(
+\frac{\delta f_1(u,\omega)}{\delta \omega},\hat{\omega} 
+\right)
+&=&\lim_{\tau \to 0}\frac{f_1(u,\omega+\tau \hat{\omega})-f_1(u,\omega)}{\tau}
+\nonumber\\
+ &=&\lim_{\tau \to 0}\frac{[-\alpha \bigtriangledown (\omega+\tau \hat{\omega}) +K^*(Ku-z)]-[-\alpha \bigtriangledown \omega +K^*(Ku-z)]}{\tau}
+\nonumber\\
+&=&-\alpha \bigtriangledown \hat{\omega}
+\end{eqnarray}
+\begin{eqnarray}
+\left(
+\frac{\delta f_1(u,\omega)}{\delta u},\hat{u} 
+\right)
+&=&\lim_{\tau \to 0}\frac{f_1(u+\tau \hat{u},\omega)-f_1(u,\omega)}{\tau}
+\nonumber\\
+&=&\lim_{\tau \to 0}\frac{[-\alpha \bigtriangledown \omega+K^*K(u+\tau \hat{u})-K^*z]-[-\alpha \bigtriangledown \omega+K^*(Ku-z)]}{\tau}
+\nonumber\\
+&=&K^*K\hat{u}
+\end{eqnarray}
+\begin{eqnarray}
+\left(
+\frac{\delta f_2(u,\omega)}{\delta \omega},\hat{\omega} 
+\right)
+&=&\lim_{\tau \to 0}\frac{f_2(u,\omega+\tau \hat{\omega})-f_2(u,\omega)}{\tau}
+\nonumber\\
+&=&\lim_{\tau \to 0}\frac{[(\omega+\tau \hat{\omega})|\bigtriangledown u|-\bigtriangledown u]-[\omega|\bigtriangledown u|-\bigtriangledown u]}{\tau}
+\nonumber\\
+&=&|\bigtriangledown u|\hat{\omega}
+\end{eqnarray}
+\begin{eqnarray}
+\left(
+\frac{\delta f_2(u,\omega)}{\delta u},\hat{u} 
+\right)
+&=&\lim_{\tau \to 0}\frac{f_2(u+\tau \hat{u},\omega)}{\tau}
+\\
+&=&\lim_{\tau \to 0}\frac{[\omega|\bigtriangledown (u+\tau \hat{u})|-\bigtriangledown(u+\tau \hat{u})]-[\omega|\bigtriangledown u|-\bigtriangledown u]}{\tau}
+\nonumber
+\end{eqnarray}
+\begin{eqnarray}
+&&\lim_{\tau \to 0}\frac{\bigtriangledown(u+\tau \hat{u})-\bigtriangledown u}{\tau}=\bigtriangledown \hat{u}
+\\
+&&\lim_{\tau \to 0} \omega\frac{|\bigtriangledown (u+\tau \hat{u})|-|\bigtriangledown u|}{\tau}
+\nonumber\\
+&=&\lim_{\tau \to 0} \omega\frac{\sqrt{(\bigtriangledown u+\tau \hat{u})^T(\bigtriangledown u+\tau \hat{u})}-\sqrt{\bigtriangledown u^T\bigtriangledown u}}{\tau}
+\nonumber\\
+&=&\lim_{\tau \to 0} \omega\frac{(\bigtriangledown u+\tau \bigtriangledown \hat{u})^T(\bigtriangledown u+\tau \bigtriangledown \hat{u})-\bigtriangledown u\bigtriangledown u^T}{\tau[\sqrt{(\bigtriangledown u+\tau \bigtriangledown \hat{u})^T(\bigtriangledown u+\tau \bigtriangledown \hat{u})}+\sqrt{\bigtriangledown u^T\bigtriangledown u}]}
+\nonumber\\
+&=&\lim_{\tau \to 0} \omega\frac{\tau\bigtriangledown \hat{u}^T \bigtriangledown u+\tau  \bigtriangledown u^T\bigtriangledown \hat{u}+\tau^2\bigtriangledown \hat{u}^T \bigtriangledown \hat{u}}{\tau[\sqrt{(\bigtriangledown u+\tau \hat{u})^T(\bigtriangledown u+\tau \hat{u})}+\sqrt{\bigtriangledown u^T\bigtriangledown u}]}
+\nonumber\\
+&=&\frac{\omega\bigtriangledown u^T \bigtriangledown \hat{u}}{|\bigtriangledown u|}
+\end{eqnarray}
+将（24）（25）代入（23）中，得：	
+\begin{eqnarray}
+\left(
+\frac{\delta f_2(u,\omega)}{\delta u},\hat{u} 
+\right)
+&=&\frac{\omega\bigtriangledown u^T \bigtriangledown \hat{u}}{|\bigtriangledown u|}-\bigtriangledown \hat{u}
+\nonumber\\
+&=&(\frac{\omega\bigtriangledown u^T}{|\bigtriangledown u|}-I)\bigtriangledown \hat{u}
+\end{eqnarray}
+故$F$的雅可比矩阵为：
+\begin{equation}
+\left[
+\begin{array}{cc}
+|\bigtriangledown u| & (\frac{\omega\bigtriangledown u^T}{|\bigtriangledown u|}-I)\bigtriangledown\\
+-\alpha\bigtriangledown & K^*K
+\end{array}
+\right]
+\end{equation}
+同理可推出论文中$u$系统的线性化形式（3.3）。
+
+\begin{thebibliography}{00}
+\bibitem{wiki}
+http://zh.wikipedia.org/wiki/%E5%AF%B9%E5%81%B6%E7%A9%BA%E9%97%B4
+
+\bibitem{weifenjihe}
+梁灿彬，周彬.《微分几何入门及广义相对论》.科学出版社,2000
+
+\bibitem{KLY}
+Krishnan D, Lin P, Yip A. A primal-dual active-set method for non-negativity constrained total variation deblurring problems. IEEE Trans
+Image Process 16(11):2766-2777,2007
+
+\bibitem{ZBO}
+Xiaoqun Zhang, Martin Burger, Stanely Osher, A Unified Primal-Dual Algorithm Framework Based on Bregman Iteration. Journal of Scientific Computing, Volume 46, Number 1, 20-46, 2011
+
+\bibitem{CHZ}
+Peijun Chen, Jianguo Huang and Xiaoqun Zhang, A Primal-Dual Fixed Point Algorithm for Convex Separable Minimization with Applications to Image Restoration. Inverse problems, 29 (2), 2013
+
+\bibitem{EZC}
+Ernie Esser, Xiaoqun Zhang, Tony F. Chan, A General Framework for a Class of First Order Primal-Dual Algorithms for Convex Optimization in Imaging Science. SIAM J. Imaging Sci., 3(4), 1015-1046,2010 
+
+\bibitem{DHN}
+Yiqiu Dong, Michael Hinterrmuller, Marrick Neri, An Efficient Primal-Dual Method for L1TV Image Restoration. SIAM J. Imaging SCIENCES, Vol 2, No. 4,pp.1168-1189.
+
+\bibitem{WCY}
+You-Wei Wen, Raymond H. Chan, Andy M. Yip, A Primal-Dual Method for Total Variation-Based Wavelet Domain Inpainting, IEEE Trans Image Process. 2012 Jan;21(1):106-14.
+
+\bibitem{NM}
+N. Megiddo, Pathways to the optiaml set in linear programming, in: N. Megiddo(Eds.), Progress in Mathematical Programming:Interior-Point and Related Methods, Springer, New York, 1989, 131-158.
+
+\bibitem{SM}
+S. Mehrotra, On the implementation of a primal-dual interior point method, SIAM Journal on Optimization, 1992, 2:575-601.
+
+\bibitem{NN}
+Y. Nesterov, A. Nemirovski, Interior point polynomial methods in convex programming: theory and application, SIAM, Philadelphia, PA,1994.
+
+\bibitem{NT}
+Y. Nesterov, M. Todd, Self-scaled barriers and interior-point methods for convex programming, Mathematical Methods of Operations Research, 1997, 22: 1-42.
+
+\end{thebibliography}
+\end{document}
+
