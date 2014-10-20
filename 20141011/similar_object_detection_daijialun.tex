@@ -1,0 +1,491 @@
+\documentclass[notheorems,mathserif,table,compress]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{comment}
+\usepackage{fancybox}
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+% \usecolortheme[<options>]{<name list>}
+%% Font Themes
+% \usefonttheme[<options>]{<name>}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+\begin{comment}
+\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+  \frame<handout:0>{
+    \frametitle{Content}\small
+    \tableofcontents[current,currentsubsection]
+  }
+}
+\AtBeginSubsection[]                            % 在每个子段落之前
+{
+  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+  {
+    \frametitle{下一节内容}\small
+    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+  }
+}
+\end{comment}
+%%----------------------------------------------------------
+\title[]{Similar Object Detection \& Analysis}
+\author[戴嘉伦]{\textcolor{olive}{戴嘉伦}}
+  %\hspace{2.28em}导师~~\textcolor{olive}{姬光荣}~教授}
+\institute[中国海洋大学]{\small\textcolor{violet}{中国海洋大学}}
+\date{\today}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{目录}
+\frame{\frametitle{目录}\tableofcontents}
+%%----------------------------------------------------------
+
+%\section{Beamer类和XeTeX概览} %如果你想书签不出现问题,请不要用\XeTeX
+                                 %这类复杂的指令,直接写XeTeX吧
+\section{研究方向}
+\begin{frame}
+  \frametitle{研究方向}
+   Similar Obeject Detection \& Analysis：相似物体的检测和分析。\\
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=4.5in]{flow.png}
+   \caption{流程图}
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{重叠图像的分割与修复}
+  \begin{figure}
+  \begin{minipage}[l]{0.4\textwidth}
+  \centering
+  \includegraphics[width=1.8in]{overlap.jpg}
+  \end{minipage}
+  \begin{minipage}[r]{0.4\textwidth}
+  \centering
+  \includegraphics[width=1.8in]{overlap1.jpg}
+  \end{minipage}
+  %\begin{minipage}
+  %\centering
+  %\includegraphics[width=2.0in]{overlap2.jpg}
+  %\caption{区域分裂合并法}
+  %\end{minipage}
+  \end{figure}
+\end{frame}
+
+\section{图像分割}
+\begin{frame}
+  \frametitle{图像分割}
+\hspace{0.3in}图像分割指的是根据灰度、颜色、纹理和形状等特征把图像划分成若干互不交迭的区域，并使这些特征在同一区域内呈现出相似性，而在不同区域间呈现出明显的差异性。\\
+  \begin{itemize}
+  \item 基于阈值分割
+  \item 基于区域分割
+  \item 基于边缘分割
+  \item 基于特定理论分割
+  %\item 基于图论分割
+  %\item 基于能量泛函分割
+  \end{itemize}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{基于阈值分割}
+    \hspace{0.3in}阈值法的基本思想是基于图像的灰度特征来计算一个或多个灰度阈值，并将图像中每个像素的灰度值与阈值相比较，最后将像素根据比较结果分到合适的类别中。\\
+    \begin{displaymath}
+    g(i,j)=\left\{\begin{array}{ll}
+    1\hspace{0.2in} g(i,j) \geq T\\
+    0\hspace{0.2in} g(i,j) < T
+    \end{array}\right.
+    \end{displaymath}
+    其中，T为阈值，对于物体的图像元素 $g(i,j)=1$ ，对于背景的图像元素 $g(i,j)=0$。
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{基于区域分割}
+   \hspace{0.3in}此类方法是将图像按照相似性准则分成不同的区域，主要包括种子区域生长法、区域分裂合并法等类型。\\
+   \begin{itemize}
+   \item 种子区域生长法是从各代表区域的种子像素开始，不断合并相邻的相似像素的过程。
+   \end{itemize}
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=2.5in]{seed1.jpg}
+   \caption{脑部图像和区域生长法分割}
+   \end{figure}
+   %2.区域分裂合并法是将图像分成若干不相交的区域，再按准则分裂成小区域，最后合并相似区域从而完成分割任务。
+\end{frame}
+
+
+\subsection{}
+\begin{frame}
+   \frametitle{基于区域分割}
+   \begin{itemize}
+   \item 区域分裂合并法是将图像分成若干不相交的区域，再按准则分裂成小区域，最后合并相似区域从而完成分割任务。
+   \end{itemize}
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=2.2in]{merge.jpg}
+   \caption{区域分裂合并法}
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{基于边缘分割}
+   \hspace{0.3in}图像分割的一种重要途径是通过边缘检测，即检测灰度级或者结构具有突变的地方，表明一个区域的终结，也是另一个区域开始的地方。\\
+   \hspace{0.3in}这种不连续性称为边缘。不同的图像灰度不同，边界处一般有明显的边缘，利用此特征可以分割图像。
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=3.5in]{border.jpg}
+   \caption{边缘检测分割}
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{基于特定理论分割}
+\hspace{0.3in}图像分割至今尚无通用的自身理论。随着各学科许多新理论和新方法的提出，出现了许多与一些特定理论、方法相结合的图像分割方法。\\
+   \begin{itemize}
+   \item 聚类分析
+   \item 模糊集理论
+   \item 基因编码
+   \end{itemize}
+\end{frame}
+
+\section{图像修复}
+\begin{frame}
+  \frametitle{图像修复}
+  \hspace{0.3in}图像修复是利用损坏图像的已知信息，按照一定规则对损坏区域进行填补，即对受到损坏的图像进行修复重建或者去除图像中的多余物体。\\
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=3.0in]{oldphoto.png}
+   \caption{旧照片修复}
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=3.1in]{removal.png}\\
+   字幕去除
+   \end{figure}
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=2.2in]{removal1.png}\\
+   目标消除
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+  \frametitle{图像修复}
+   \begin{itemize}
+   \item 基于非纹理结构的修复
+   \item 基于纹理结构的修复
+   \item 基于学习的修复
+   \end{itemize}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{图像修复}
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=4.0in]{diagram.png}
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{基于非纹理结构的修复}
+   基于非纹理结构的修复技术主要用于修复小尺度破损的数字图像。 \\
+   \begin{itemize}
+   \item 模拟微观修复机制
+   \item 模拟宏观修复机制
+   \item 基于曲率驱动扩散
+   \end{itemize}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{基于非纹理结构的修复}
+   \begin{figure}
+   \centering
+   \includegraphics[width=1.8in]{repair.png}
+   \caption{BSCB模型修复}
+   \end{figure}
+   \begin{figure}
+   \centering
+   \includegraphics[width=1.8in]{repair1.png}
+   \caption{修复结果}
+   \end{figure}   
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{基于纹理结构的修复}
+   基于纹理结构的图像修复技术，主要用于填充图像中大块丢失的信息。\\
+   \begin{itemize}
+   \item 基于图像分解的修复技术
+   \end{itemize}
+   \hspace{0.3in}将图像分解为结构部分和纹理部分，结构部分用修补算法修补，纹理部分用纹理合成方法填充。\\
+   \begin{itemize}
+   \item 基于样本的纹理合成技术
+   \end{itemize}
+   \hspace{0.3in}此类算法也称为图像补全，即填充丢失信息。从待修补区域的边界上选取一个像素点，以该点为中心，选取大小合适的纹理块，然后在待修补区域的周围寻找与之最相近的纹理匹配块，来代替该纹理块。
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{基于学习的修复}
+  \hspace{0.3in} 基于非学习的方法：通过设定一些前提条件如平滑性假设、局部相似性假设，然后以此为基础进行修复。\\
+   \hspace{0.3in}基于学习的方法：在原图的有效区域中，通过学习发掘出图像的统计信息或先验概率，并通过某些优化算法如梯度下降法等来获得修复结果。
+   \begin{figure}
+   \centering
+   \includegraphics[width=1.6in]{study.png}
+   \caption{修复结果}
+   \end{figure}   
+\end{frame}
+
+\section{数学形态学}
+\begin{frame}
+   \frametitle{数学形态学}
+   \begin{itemize}
+   \item 概念
+   \item 应用
+   \item 基本步骤
+   \item 应用算法
+   \end{itemize}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{概念}
+    \hspace{0.3in}“数学形态学”（Mathematical Morphology）是一种应用于图像处理和模式识别领域的方法。\\
+   \begin{itemize}
+   \item 集合论
+   \end{itemize}
+   \hspace{0.3in}集合论是研究集合的数学理论，包含了集合、元素和成员关系等最基本的数学概念。\\
+   \begin{itemize}
+   \item 形态学
+   \end{itemize}
+   \hspace{0.3in} 形态学是获取物体拓扑核结构信息，通过物体核结构元素相互作用的某些运算，得到物体更本质的形态。\\
+\end{frame}
+
+
+\subsection{}
+\begin{frame}
+   \frametitle{应用}
+   \begin{itemize}
+   \item 利用形态学的基本运算，对图像进行观察和处理，达到改善图像质量的目的
+   \item 描述和定义图像的各种几何参数和特征，诸如面积，周长，连通度，颗粒度和方向性。
+   \end{itemize}
+   实际应用
+   \begin{itemize}
+   \item 计算机显微图像分析
+   \item 医学图像处理
+   \item 工业检测
+   \item 计算机视觉
+   \item 汽车运动监测情况
+   \end{itemize}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{基本步骤}
+   \begin{itemize}
+   \item 提出所要描述的物体几何结构模式，即提取物体的几何结构特征
+   \item 根据该模式选择相应的结构元素，结构元素应该简单而对模式具有最强的表现力
+   \item 用选定的结构元对图像进行击中与否（HMT）变换，便可得到比原始图像显著突出物体特征信息的图像
+   \item 经过形态变换后的图像提取所需信息
+   \end{itemize}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{应用算法}
+   \begin{itemize}
+   \item 腐蚀算法
+   \item 膨胀算法
+   \item 分水岭算法
+   \item 开算法
+   \item 闭算法
+   \end{itemize}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{腐蚀算法}
+    \hspace{0.2in}腐蚀算法主要用来抽取图像的骨架。
+   \begin{itemize}
+   \item 建立结构元素（骨头的模型），并确定中心点。
+   \item 在待处理图像中寻找结构元素。
+   \item 匹配到结构元素的部分只保留中心点。
+   \item 中心点的集合就是原图像经过腐蚀后剩下的骨架。
+   \end{itemize}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{腐蚀算法}
+   \hspace{0.3in}把结构元素$B$平移$a$后得到$B_{a}$，若$B_{a}$包含于$X$，我们记下这个$a$点，所有满足上述条件的$a$点组成的集合称做$X$被$B$腐蚀(Erosion)的结果。\\
+   用公式表示为：$E(X)=\{a\mid B_{a}\subset X \}=X\ominus B$
+   \begin{figure}
+   \centering
+   \includegraphics[width=2.0in]{erosion_1.jpg}
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{腐蚀算法}
+   \hspace{0.3in}左边是被处理的图象$X$(二值图象，我们针对的是黑点)，中间是结构元素$B$，那个标有origin的点是中心点，即当前处理元素的位置。\\
+   \hspace{0.3in}腐蚀的方法是，拿$B$的中心点和$X$上的点一个一个地对比，如果$B$上的所有点都在$X$的范围内，则该点保留，否则将该点去掉\\
+   \hspace{0.3in}右边是腐蚀后的结果，它仍在原来$X$的范围内，且比$X$包含的点要少，就象$X$被腐蚀掉了一层。
+   \begin{figure}
+   \centering
+   \includegraphics[width=3.0in]{erosion_2.jpg}
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{腐蚀算法}
+   \begin{figure}
+   \centering
+   \includegraphics[width=3.0in]{origin.jpg}
+   \caption{原图}
+   \end{figure}
+   \begin{figure}
+   \centering
+   \includegraphics[width=3.0in]{erosion.jpg}
+   \caption{腐蚀后的结果图}
+   \end{figure}
+\end{frame}
+
+
+\subsection{}
+\begin{frame}
+   \frametitle{膨胀算法}
+   \hspace{0.3in}膨胀是将与物体接触的所有背景点合并到该物体中，使边界向外部扩张的过程。可以用来填补物体中的空洞。\\
+   \hspace{0.3in}膨胀(dilation)可以看做是腐蚀的对偶运算，其定义是：把结构元素$B$平移$a$后得到$B_{a}$，若$B_{a}$击中$X$，我们记下这个$a$点。所有满足上述条件的$a$点组成的集合称做$X$被$B$膨胀的结果。\\
+   用公式表示为：$D(X)=\{a\mid B_{a}\uparrow X\}=X\oplus B$
+   \begin{figure}
+   \centering
+   \includegraphics[width=2.0in]{expand_1.jpg}
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{膨胀算法}
+  \hspace{0.3in}左边是被处理的图象$X$(二值图象，我们针对的是黑点)，中间是结构元素$B$，右边是膨胀后的结果。\\
+  \hspace{0.3in}膨胀的方法是，拿$B$的中心点和$X$上的点及$X$周围的点一个一个地对，如果$B$上有一个点落在$X$的范围内，则该点就为黑；可以看出，它包括$X$的所有范围，就像$X$膨胀了一圈似的。
+   \begin{figure}
+   \centering
+   \includegraphics[width=3.0in]{expand_2.jpg}
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{膨胀算法}
+   \begin{figure}
+   \centering
+   \includegraphics[width=2.5in]{origin.jpg}\\
+   原图
+   \end{figure}
+   \begin{figure}
+   \centering
+   \includegraphics[width=2.8in]{expand.png}\\
+   膨胀后的结果图
+   \end{figure}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{分水岭算法}
+   \hspace{0.2in}分水岭分割方法，是一种基于拓扑理论的数学形态学的分割方法。
+   \begin{itemize}
+   \item 把图像看作是测地学上的拓扑地貌，图像各点像素的灰度值表示海拔高度。
+   \item 每一个局部极小值区域为集水盆，而集水盆边界则形成分水岭。
+   \item 在各局部极小值表面，刺穿一个小孔，把整个模型慢慢浸入水中。
+   \item 随着浸入的加深，各局部极小值的影响域向外扩展，在两个集水盆汇合处构筑大坝，即形成分水岭。
+   \end{itemize}
+\end{frame}
+
+\subsection{}
+\begin{frame}
+   \frametitle{分水岭算法}
+   \hspace{0.3in}分水岭分割算法把图像看成一幅“地形图”，其中亮度比较强的区域像素值较大，而比较暗的区域像素值较小，通过寻找“汇水盆地”和“分水岭界限”，对图像进行分割。
+   \begin{figure}
+   \centering
+   \includegraphics[width=2.5in]{watershed.png}
+   \caption{分水岭构造}
+   \end{figure}
+\end{frame}
+
+\begin{frame}
+   \begin{figure}
+  \begin{minipage}[t]{0.4\textwidth} 
+    \centering 
+    \includegraphics[width=1.5in]{watershed_1.png} \\
+    原始图像
+  \end{minipage}
+  \begin{minipage}[t]{0.4\textwidth} 
+    \centering 
+    \includegraphics[width=1.5in]{watershed_2.png} \\
+    灰度图像
+  \end{minipage}
+  \begin{minipage}[b]{0.4\textwidth} 
+    \centering 
+    \includegraphics[width=1.5in]{watershed_3.png} \\
+    局部极大值图像
+  \end{minipage}
+  \begin{minipage}[b]{0.4\textwidth} 
+    \centering 
+    \includegraphics[width=1.5in]{watershed_4.png} \\
+    原图显示局部极大值
+  \end{minipage}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+   \begin{Huge}
+   \textbf{Thank you very much!}
+   \end{Huge}
+\end{frame}
+
+
+\end{document}
