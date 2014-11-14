@@ -1,0 +1,261 @@
+\documentclass[notheorems,mathserif,table,compress]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{comment}
+\usepackage{fancybox}
+\usepackage{tcolorbox}
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+% \usecolortheme[<options>]{<name list>}
+%% Font Themes
+% \usefonttheme[<options>]{<name>}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+\begin{comment}
+\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+  \frame<handout:0>{
+    \frametitle{Content}\small
+    \tableofcontents[current,currentsubsection]
+  }
+}
+\AtBeginSubsection[]                            % 在每个子段落之前
+{
+  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+  {
+    \frametitle{Contents}\small
+    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+  }
+}
+\end{comment}
+%%----------------------------------------------------------
+\title[Hausdorff距离]{Hausdorff距离}
+\author[wrc]{汇报人~~~~\textcolor{olive}{王如晨}}
+%\hspace{2.28em}导师~~\textcolor{olive}{}~教授}
+\institute[ouc]{\small\textcolor{violet}{中国海洋大学~~~~信息科学与工程学院}}
+\date{2014年11月}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}  %海大校徽
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{目录}
+\frame{\frametitle{Contents}\tableofcontents}
+%%----------------------------------------------------------
+
+%\section{Beamer类和XeTeX概览} %如果你想书签不出现问题,请不要用\XeTeX
+                                 %这类复杂的指令,直接写XeTeX吧
+\section{经典Hausdorff距离}
+
+%\subsection{是什么？}
+
+\begin{frame}
+\frametitle{Hausdorff距离}
+  %\begin{tcolorbox}[colback=red!5,colframe=blue!75!black]
+   {\color{blue}\textbf{Hausdorff距离}}是描述两组点集之间相似程度的一种度量,是一种定义于两个点集上的最大最小距离。
+
+~~~~~~若给定两个点集，$A=\{a_{1},a_{2},\cdots\}$，$B=\{b_{1},b_{2},\cdots\}$ ，则点集A、B之间的Hausdorff距离定义为：
+\begin{displaymath}
+H(A,B)=\max[h(A,B),h(B,A)]
+\end{displaymath}
+~~~~~~其中，$h(A,B)$称为集合A到B有向Hausdorff距离，即点集A中所有点到点集B的最小距离的最大值。
+\begin{displaymath}
+h(A,B)=\max_{\begin{subarray}{l}
+              a\in A
+               \end{subarray}}
+       d_{B}(a)
+~~~~
+d_{B}(a)=\min_{\begin{subarray}{l}
+              b\in B
+               \end{subarray}}
+        \parallel a-b \parallel
+\end{displaymath}
+  %\end{tcolorbox}
+\end{frame}
+
+
+%\subsection{部分Hausdorff距离（PHD）}
+
+\begin{frame}
+%\frametitle{基本流程}
+
+   \begin{figure}[!ht]
+    \begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=1.5in]{dian111.png}
+    \caption{$a_{1}$到$B$的距离}
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=1.5in]{dian112.png}
+    \caption{$a_{2}$到$B$的距离}
+    \end{minipage}
+   \end{figure}
+\end{frame}
+
+\begin{frame}
+%\frametitle{基本流程}
+   \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1.5in]{dian41.png}
+    \caption{点集$A$到$B$的距离}
+   \end{figure}
+\end{frame}
+
+
+\begin{frame}
+%\frametitle{基本流程}
+
+   \begin{figure}[!ht]
+    \begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=1.5in]{dian223.png}
+    \caption{$b_{1}$到$A$的距离}
+    \end{minipage}
+    \begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=1.5in]{dian222.png}
+    \caption{$b_{2}$到$A$的距离}
+    \end{minipage}
+    \begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=1.5in]{dian221.png}
+    \caption{$b_{3}$到$A$的距离}
+    \end{minipage}
+   \end{figure}
+\end{frame}
+
+\begin{frame}
+%\frametitle{基本流程}
+
+   \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1.5in]{dian42.png}
+    \caption{点集$B$到$A$的距离}
+   \end{figure}
+\end{frame}
+
+\begin{frame}
+%\frametitle{基本流程}
+
+   \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1.5in]{dian3.png}
+    \caption{点集$A$、$B$之间的距离}
+   \end{figure}
+\begin{displaymath}
+H(A,B)=\max[h(A,B),h(B,A)]
+\end{displaymath}
+\end{frame}
+
+\begin{frame}
+\frametitle{经典Hausdorff距离的缺点}
+%  \begin{tcolorbox}[colback=red!5,colframe=blue!75!black]
+~~~~~~受到噪声的影响较大。例如，即使A、B的形状相似，只要A中有一个点偏离B较远，那么计算出来的Hausdorff距离就会很大。
+%  \end{tcolorbox}
+\end{frame}
+
+\section{部分Hausdorff距离（PHD）}
+
+\begin{frame}
+\frametitle{部分Hausdorff距离（PHD）}
+ % \begin{tcolorbox}[colback=red!5,colframe=blue!75!black]
+{\color{blue}\textbf{部分Hausdorff距离}}的定义：
+\begin{displaymath}
+H_{K}(A,B)=\max[h_{K}(A,B),h_{K}(B,A)]
+\end{displaymath}
+\begin{displaymath}
+h_{K}=K^{th}_{\begin{subarray}{l}
+              a\in A
+               \end{subarray}}
+d_{B}(a)
+\end{displaymath}
+~~~~~~部分Hausdorff距离中，要求出点集A中所有点到点集B的距离，然后将这些距离从小到大排序，其中序号为K的距离就是$h_{K}(A,B)$。
+\begin{displaymath}
+K=[f\times N_{A}]
+\end{displaymath}
+~~~~~~部分hausdorff距离可以有效处理当目标发生遮蔽和有外部点存在的情形。
+  %\end{tcolorbox}
+\end{frame}
+
+\section{改进Hausdorff距离（MHD）}   
+ 
+\begin{frame}
+\frametitle{改进Hausdorff距离（MHD）}
+{\color{blue}\textbf{改进Hausdorff距离}}的定义：
+\begin{displaymath}
+H_{K}(A,B)=\max[h_{MHD}(A,B),h_{MHD}(B,A)]
+\end{displaymath}
+\begin{displaymath}
+h_{MHD}(A,B)=\frac{1}{N_{A}}\sum_{a\in A} d_{B}(a)
+\end{displaymath}
+~~~~~~改进Hausdorff距离中，$h_{MHD}(A,B)$要求出点集A中所有点到点集B的距离，然后求取距离的平均值。
+\end{frame}      
+
+\section{LTS Hausdorff距离} 
+\begin{frame}
+\frametitle{LTS Hausdorff距离}
+{\color{blue}\textbf{LTS Hausdorff距离}}为了获得更加准确的目标匹配结果，结合上面两种方法得到的。
+\begin{displaymath}
+H_{LTS}(A,B)=\max[h_{LTS}(A,B),h_{LTS}(B,A)]
+\end{displaymath}
+\begin{displaymath}
+h_{LTS}(A,B)=\frac{1}{H}\sum_{i=1}^{H} d_{B}(a)_{i}
+\end{displaymath}
+~~~~~~其中，$H=h\times N_{A},0<h<1$，$N_{A}$是点集$A$的个数，$d_{B}(a)_{i}$表示对序列$d_{B}(a)$排序后第i个距离。
+
+~~~~~~LTS Hausdorff距离是一种排序再求部分均值的方法来确定点集A，B之间的距离。这种方法将噪声干扰和遮挡产生的大距离问题去除。
+\end{frame}
+
+\section{应用} 
+\begin{frame}
+\frametitle{应用}
+ 图像匹配
+
+   \begin{figure}[!ht]
+    \begin{minipage}{0.2\textwidth}
+    \centering
+    \includegraphics[width=0.5in]{mo.png}
+    \end{minipage}
+    \begin{minipage}{0.2\textwidth}
+    \centering
+    \includegraphics[width=1in]{mu.png}
+    \end{minipage}
+   \end{figure}
+   \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1in]{pi.png}
+   \end{figure}
+\end{frame}
+
+\end{document}
+
