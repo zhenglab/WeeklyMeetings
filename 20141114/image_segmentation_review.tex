@@ -1,0 +1,333 @@
+\documentclass[notheorems,mathserif,table,compress]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{comment}
+\usepackage{fancybox}
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+% \usecolortheme[<options>]{<name list>}
+%% Font Themes
+% \usefonttheme[<options>]{<name>}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+\begin{comment}
+\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+  \frame<handout:0>{
+    \frametitle{Content}\small
+    \tableofcontents[current,currentsubsection]
+  }
+}
+\AtBeginSubsection[]                            % 在每个子段落之前
+{
+  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+  {
+    \frametitle{下一节内容}\small
+    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+  }
+}
+\end{comment}
+%%----------------------------------------------------------
+\title[]{Image Segmentation Review}
+\author[戴嘉伦]{\textcolor{olive}{戴嘉伦}}
+  %\hspace{2.28em}导师~~\textcolor{olive}{姬光荣}~教授}
+\institute[中国海洋大学]{\small\textcolor{violet}{中国海洋大学}}
+\date{\today}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{目录}
+\frame{\frametitle{目录}\tableofcontents}
+%%----------------------------------------------------------
+
+%\section{Beamer类和XeTeX概览} %如果你想书签不出现问题,请不要用\XeTeX
+                                 %这类复杂的指令,直接写XeTeX吧
+
+\begin{frame}
+  \frametitle{流程步骤}
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=4.5in]{path.png}
+   \end{figure}
+\end{frame}
+
+\section{区域分割}
+\begin{frame}
+  \frametitle{区域分割}
+   区域分割
+   \begin{itemize}
+   \item 将图像分为若干区域，每个区域内部有相似性，不同区域性质不同
+   \item 涉及空间关联信息以及颜色信息，鲁棒性好
+   \item 适用于自然场景，复杂场景等先验知识不足的图像分割 
+   \item 单独分割效果较差，受噪声影响，容易造成过分割。因此区域法一般和别的算法结合使用
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{区域分割}
+   \begin{itemize}
+   \item 区域生长
+         \begin{itemize}
+         \item 计算简单，适合于边缘光滑，没有先验知识的图像分割
+         \item 使用迭代算法，时间空间消耗较大
+         \item 效果依赖于“种子点”的选择以及生长顺序
+         \end{itemize}
+   \item 区域合并分裂
+         \begin{itemize}
+         \item 思路直接，不依赖“种子点”的选择
+         \item 像素级的分裂增加合并的工作量，提高时间复杂度
+         \item 可能会使分割区域的边界破坏
+         \end{itemize}         
+   \end{itemize}
+\end{frame}
+
+\section{边缘分割}
+\begin{frame}
+  \frametitle{边缘分割}
+   边缘分割
+   \begin{itemize}
+   \item 边缘通常是灰度、颜色或纹理等性质不连续的地方
+   \item 适合边缘灰度值过渡比较显著且噪声较小的简单图像
+   \item 梯度算子对于边缘与噪声敏感，一般需要先预处理
+   \end{itemize}
+   边缘检测分类
+   \begin{itemize}
+   \item 串行边缘检测：确定当前像素点是否属于欲检测边缘上的点，取决于先前像素点的验证结果，受到起始点影响
+   \item 并行边缘检测：确定当前像素点是否属于欲检测边缘上的点，取决于当前正在检测的像素点以及相邻的像素点，该模型可以同时用于检测所有像素点
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+   \frametitle{边缘分割}
+   \begin{itemize}
+   \item 梯度算子
+         \begin{itemize}
+         \item 一阶算子
+               \begin{itemize}
+               \item Canny算子
+               \item Robots算子
+               \item Prewitt算子
+               \item Sobel算子
+               \end{itemize}
+         \item 二阶算子
+               \begin{itemize}
+               \item Laplacian算子
+               \item Kirsch算子
+               \item Wallis算子
+               \item Log算子
+               \end{itemize}
+         \end{itemize}
+   \item 基于形变模型方法
+         \begin{itemize}
+         \item 参数可形变模型
+         \item 几何可形变模型
+         \end{itemize} 
+   \item 曲线拟合和边界曲线拟合
+         \begin{itemize}
+         \item 曲面拟合
+         \item 边界曲线
+         \end{itemize} 
+   \item 基于边缘和区域信息结合方法        
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{边缘分割}
+        \begin{itemize}
+        \item Canny算子（常用）
+            \begin{itemize}
+            \item 找到最优的边缘检测算法
+            \item 抑制噪声
+            \end{itemize}
+        \item Robots算子 %\newline
+            \begin{itemize}
+            \item 适用于陡峭边缘的低噪声图像
+            \item 不能抑制噪声，而且实施过程中增强了噪声
+            \end{itemize}
+        \item Prewitt算子 %\newline
+              %有利于分割较多噪声，灰度渐变的图像分割
+           \begin{itemize}
+           \item 有利于分割较多噪声，灰度渐变的图像分割
+           \end{itemize}
+        \item Sobel算子（常用） %\newline
+	      %有利于分割较多噪声，灰度渐变的图像分割	
+            \begin{itemize}
+            \item 有利于分割较多噪声，灰度渐变的图像分割
+            \end{itemize}
+        \item Laplacian算子 %\newline
+	     %具有各向同性的特点，但是增大了噪声
+            \begin{itemize}
+            \item 具有各向同性的特点，但是增大了噪声
+            \end{itemize}
+        \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{边缘分割}
+  \begin{itemize}
+  \item 基于形变模型方法
+       \begin{itemize}
+       \item 模型的形变自由度大，可以逼近形状不规则的曲线
+       \item 保证边界曲线的拓扑性，具有强鲁棒性
+       \item 运算量大，难收敛于凹形区域
+       \end{itemize}
+  \item 曲线拟合和边界曲线拟合
+       \begin{itemize}
+       \item 曲线拟合：将灰度看成高度，用一个曲面来拟合一个小窗口内的数据，然后根据该曲面来决定边缘点
+       \item 边界曲线：用平面曲线来表示不同区域之间的图像边界线
+       \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{阈值分割}
+\begin{frame}
+  \frametitle{阈值分割}
+  阈值分割
+  \begin{itemize}
+  \item 目标区域与背景区域或者不同区域之间的灰度值存在差异
+  \item 将灰度均一性作为依据，很少考虑图像的空间位置关系
+  \item 不存在明显灰度差异或灰度值范围有较大重叠的图像，难以得到准确结果
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{阈值分割}
+  \begin{itemize}
+  \item 全阈值分割
+  \item 自适应阈值分割
+  \item 最大类间方差法（Otsu算法）
+  \item 迭代式最优阈值分割
+  \item 最小误差法和均匀化误差法
+  \item 特征聚类法
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{阈值分割}
+  \begin{itemize}
+  \item 全阈值分割
+       \begin{itemize}
+       \item 适用于目标和背景相差较大的图像
+       \item 简单，局限性大
+       \end{itemize}
+  \item 自适应阈值分割
+       \begin{itemize}
+       \item 受噪声影响较大
+       \item 较全阈值方法效果好，稳定性强
+       \end{itemize}
+  \item 最大类间方差法（Otsu算法）
+       \begin{itemize}
+       \item 为自适应阈值分割法的一种
+       \item 计算简单，不受图像亮度和对比度影响
+       \item 对于背景和目标具有较大的灰度差时，分割效果最好
+       \end{itemize}
+  \item 迭代式最优阈值分割
+       \begin{itemize}
+       \item 减小分割产生的误差
+       \item 所得最佳阈值不受噪声干扰
+       \end{itemize}
+  \end{itemize}
+\end{frame}
+
+
+
+\section{特定理论分割}
+\begin{frame}
+  \frametitle{特定理论分割}
+  \begin{itemize}
+  \item 基于模糊集分割
+       \begin{itemize}
+       \item 针对不全面、不准确、模糊、矛盾的图像分割情况
+       \item 用于处理图像的不确定性问题，效率低、消耗时间
+       \end{itemize}
+  \item 人工神经网络分割
+       \begin{itemize}
+       \item 分割问题转化为能量最小化、分类等问题
+       \item 需要大量的训练样本集，计算速度难以达到要求，受到限制
+       \end{itemize}
+  \item 遗传算法分割
+       \begin{itemize}
+       \item 自然选择机制的、并行的、统计的、随机化搜索方法
+       \item 不适合处理大规模计算量
+       \end{itemize}
+  \item 基于小波分析和变换分割
+  \item 活动轮廓模型法（Snake模型）
+  \end{itemize}
+\end{frame}
+
+
+
+\section{统计学分割}
+\begin{frame}
+   \frametitle{统计学分割}
+   \begin{itemize}
+   \item 马尔科夫随机场
+       \begin{itemize}
+       \item 将各个点的颜色值当做是具有一定概率分布的随机变量
+       \item 正确分割图像从统计学的角度看就是找出最有可能得到该图像的物体组合
+       \item 应用难点在于选取合适的参数控制空间相关性的强度，而且算法计算量很大
+       \end{itemize}
+   \item 标记法
+       \begin{itemize}
+       \item 将图像中想分割成的目标分别以不同标号表示
+       \item 对图像中的每一个像素，用一定方式赋予标号中的某一个
+       \item 标号相同的像素就组成该标号所代表的物体
+       \end{itemize}
+   \item 混合分布法
+       \begin{itemize}
+       \item 把图像中每一个像素的灰度值看成是几个概论分布按一定比例的混合
+       \item 优化基于最大后验概率的目标函数，估计这些概率分布的参数与混合比例
+       \end{itemize}
+   \end{itemize}
+\end{frame}
+
+\section{数学形态学分割}
+\begin{frame}
+   \frametitle{数学形态学分割}
+   \begin{itemize}
+   \item 膨胀腐蚀分割
+   \item 测地重建法
+   \item 分水岭算法
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+   \begin{Huge}
+   \textbf{Thank you very much!}
+   \end{Huge}
+\end{frame}
+
+
+\end{document}
