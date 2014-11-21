@@ -1,0 +1,497 @@
+\documentclass[notheorems,mathserif,table,compress]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{comment}
+\usepackage{fancybox}
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+% \usecolortheme[<options>]{<name list>}
+%% Font Themes
+% \usefonttheme[<options>]{<name>}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+\begin{comment}
+\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+  \frame<handout:0>{
+    \frametitle{Content}\small
+    \tableofcontents[current,currentsubsection]
+  }
+}
+\AtBeginSubsection[]                            % 在每个子段落之前
+{
+  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+  {
+    \frametitle{下一节内容}\small
+    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+  }
+}
+\end{comment}
+%%----------------------------------------------------------
+\title[]{Overlapping Identification \& Segmentation}
+\author[戴嘉伦]{\textcolor{olive}{戴嘉伦}}
+  %\hspace{2.28em}导师~~\textcolor{olive}{姬光荣}~教授}
+\institute[中国海洋大学]{\small\textcolor{violet}{中国海洋大学}}
+\date{\today}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{目录}
+\frame{\frametitle{目录}\tableofcontents}
+%%----------------------------------------------------------
+
+%\section{Beamer类和XeTeX概览} %如果你想书签不出现问题,请不要用\XeTeX
+                                 %这类复杂的指令,直接写XeTeX吧
+
+\begin{frame}
+  \frametitle{流程步骤}
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=4.5in]{path.png}
+   \end{figure}
+\end{frame}
+
+
+
+\section{重叠细胞状态}
+\begin{frame}
+  \frametitle{重叠细胞状态\footnote{傅蓉，细胞重叠与融合性图像的分离与分割技术研究，2007，第一军医大学博士学位论文}}
+   \begin{itemize}
+   \item 串联：首尾相连，细胞之间没有围成一个封闭区域
+   \item 并联：细胞相互围成一个封闭的区域
+   \item 串并联：既有串联又有并联
+   \end{itemize}
+   \begin{figure}
+   \begin{minipage}[t]{0.3\textwidth} 
+     \centering 
+     \includegraphics[width=1.4in]{chuan.png} \\
+     串联
+   \end{minipage}
+   \begin{minipage}[t]{0.3\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{bing.png} \\
+     并联
+   \end{minipage}
+   \begin{minipage}[b]{0.3\textwidth} 
+     \centering 
+     \includegraphics[width=1.5in]{chuanbing.png} \\
+     串并联
+   \end{minipage}
+\end{figure}
+\end{frame}
+
+
+\section{判断细胞重叠}
+\begin{frame}
+  \frametitle{判断细胞重叠}
+   \begin{itemize}
+   \item 特征参数
+   \item 核心坐标
+   \item 凹区数量
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{特征参数\footnote{李盛阳，医学细胞图像分割与分析方法研究，2003，山东科技大学硕士学位论文}}
+   \begin{itemize}
+   \item 形态特征参数
+         \begin{itemize}
+         \item 面积
+         \item 周长
+         \item 圆度
+         \item 长度比
+         \item 矩形宽
+         \item 形态因子
+         \end{itemize}
+   \item 纹理特征参数
+         \begin{itemize}
+         \item 灰度共生矩阵
+         \end{itemize} 
+   \item 光密度特征参数
+         \begin{itemize}
+         \item 积分光密度
+         \item 细胞平均光密度
+         \end{itemize}             
+   \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{形态特征参数\footnote{吴菁，医学显微细胞图像提取核分割技术的研究与实现，2010年，电子科技大学硕士学位论文}}
+   \begin{itemize}
+   \item 面积：屏幕像素点的数量，通过换算公式计算面积大小
+   \item 周长：通过链码的方法，用边界上相邻像素间距离之和来表示
+   \item 圆度：被用于表示区域和圆形的偏离度
+   \item 长宽比：侧重反映椭圆程度
+   \item 矩形度：表示区域与矩形的偏离程度\newline
+   \end{itemize}
+   \hspace{0.3in}矩形度，圆度，长度比这3个指标是从不同的角度来描述与某一形态的近似与偏离程度，结合起来可以更好地对形态有一个更精确的描述
+\end{frame}
+
+\begin{frame}
+   \begin{itemize}
+   \item 形状因子\footnote{左香玉，重叠细胞的判别与分割计数方法研究，2011，太原理工大学硕士学位论文}：使用面积和周长作为圆形程度的量度\newline
+定义为：$G=\frac{4\pi S}{p^2}$，其中$S$为面积，$p$为周长 \\
+   %周长：通过链码的方法，用边界上相邻像素间距离之和来表示\\
+  %面积：1.基于边界链码的表示法，转换为线段表  2.基于区域像素的表示法，用标记联通分量的方法对像素个数做统计\\
+   	\begin{itemize}
+   	\item 判别细胞重叠与否的关键因素是特征参数中的形状因子
+  	 \item 适用于圆形或类圆形的细胞，对于单个狭长型细胞的判别效果差
+  	\end{itemize}
+   \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+   \begin{itemize}
+    \item 每种细胞的周长、面积都有一个大致范围
+    \item 对于面积一定的细胞来说，圆的周长最小，因此周长越小，凸性越接近于圆，也越光滑；反之，周长越大图形表面褶皱越多
+    \item 当细胞存在重叠时，其边界由于凹陷会相应地导致形状因子变小
+    \item 串联粘连细胞的周长最大，因此其形状因子最小，而重叠的比较厉害的细胞，其形状因子会增大
+    \item 根据形态因子的大小变化确定阈值，通过该阈值可以判断是否存在重叠
+  \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{核心提取\footnote{傅蓉，细胞重叠与融合性图像的分离与分割技术研究，2007，第一军医大学博士学位论文}}
+  图形核心：每个细胞都存在图形的核心。
+  \begin{itemize}
+  \item 根据核心坐标数量，判断是否重叠与重叠类型
+  \item 有助于定位，分析整体分布，平均中心距离等分布参数\newline
+  \end{itemize}
+  核心获取方法：
+  \begin{itemize}
+  \item 基于距离变换：提取核心，将目标区域的像素值变换为与该区域边缘的距离值
+  \item 基于数学形态学：通过极限腐蚀运算，获得核心位置
+  \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{距离变换}
+  \begin{itemize}
+  \item 越接近区域边界的像素点，其距离值越小
+  \item 越接近核心的像素点，距离值越大，核心处的距离值最大
+  \item 通过距离变换后提取图像中的最大值就可确定核心
+  \item 此类方法适合类圆形细胞
+  \end{itemize}
+  \begin{figure}
+   \begin{minipage}[t]{0.3\textwidth} 
+     \centering 
+     \includegraphics[width=1.3in]{erzhitu.png} \\
+     二值图
+   \end{minipage}
+   \begin{minipage}[t]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.3in]{juli.png} \\
+     距离图
+   \end{minipage}
+   \begin{minipage}[b]{0.3\textwidth} 
+     \centering 
+     \includegraphics[width=1.3in]{seed.png} \\
+     核心
+   \end{minipage}
+   \end{figure}
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{数学形态学}
+  \begin{itemize}
+  \item 重叠细胞的边界一层层地进行腐蚀运算
+  \item 腐蚀过程中，细胞形状缩小，核心位置基本未发生改变
+  \item 利用腐蚀后被分离的单个细胞核心作为腐蚀前重叠细胞的核心\newline
+  \end{itemize}
+  该方法计算核心的前提是细胞重叠在一起时，需要一定的凹陷特征
+\end{frame}
+
+
+
+\begin{frame}
+  \begin{figure}
+   \begin{minipage}[t]{0.5\textwidth} 
+     \centering 
+     \includegraphics[width=2.5in]{distance1.png} \\
+     圆形
+   \end{minipage}
+   \begin{minipage}[t]{0.5\textwidth} 
+     \centering 
+     \includegraphics[width=2.5in]{distance2.png} \\
+     椭圆形
+   \end{minipage}
+   \end{figure}
+\end{frame}
+
+
+\begin{frame}
+  \begin{figure}
+   \begin{minipage}[t]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{core1.png} \\
+     串联
+   \end{minipage}
+   \begin{minipage}[t]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{core2.png} \\
+     串联核心
+   \end{minipage}
+   \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{core3.png} \\
+     串并联
+   \end{minipage}
+   \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{core4.png} \\
+     串并联核心
+   \end{minipage}
+   \end{figure}
+\end{frame}
+
+
+
+
+\section{重叠细胞图像的分割思路}
+\begin{frame}
+   \frametitle{重叠细胞图像的分割思路\footnote{吴菁，医学显微细胞图像提取核分割技术的研究与实现，2010年，电子科技大学硕士学位论文}}
+   \begin{itemize}
+   \item 基于模型的方法
+         \begin{itemize}
+         \item 大量的搜索
+         \item 算法运行效率低
+         \item 达不到实际要求
+         \end{itemize}
+   \item 基于凹点寻找分离点对
+   \item 基于数学形态学方法 
+   \end{itemize}
+\end{frame}
+
+
+
+\section{处理重叠粘连的分割算法}
+\begin{frame}
+  \frametitle{处理重叠粘连的分割算法}
+  \begin{itemize}
+  \item 基于分离点搜索的分离算法
+  \item 基于凹点搜寻的重叠细胞图像分割
+  \item 综合凹点分析与边缘检测的分割算法
+  \item 基于数学形态学的腐蚀膨胀法
+  \item 分水岭变换或测地重建法寻找重叠细胞的分割线
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{基于分离点搜索的分离算法}
+   分离点对：最终用来进行分离重叠区域的一个点对
+   \begin{itemize}
+   \item 处于重叠细胞的连接处
+   \item 处于中轴的两侧
+   \item 分离点直接连线的距离是局部最小的\newline
+   \end{itemize}
+   因此，只要寻找到分离点对，并连接分离点就可以有效分割重叠图像
+\end{frame} 
+
+
+\begin{frame}
+  \frametitle{分离点获取方法\footnote{陆振晔，范影乐，庞全，基于数学形态学的重叠细胞分离方法及比较研究，计算机与工程应用，2004年06期}}
+   \begin{itemize}
+   \item 二值图像进行连续腐蚀，使聚集在一起的图像分离为一些小区域
+   \item 在此基础上，求取内连接点
+   \item 由内连接点在未经腐蚀的区域的边缘轮廓上搜索分离点，即最短距离点
+   \end{itemize}
+  \begin{figure}
+   \begin{minipage}[t]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.7in]{inpoint1.png} \\
+     原始图像
+   \end{minipage}
+   \begin{minipage}[t]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.5in]{inpoint2.png} \\
+     内连接点
+   \end{minipage}
+   \end{figure}
+\end{frame} 
+
+
+\begin{frame}
+  \frametitle{分离点获取方法\footnote{李盛阳，医学细胞图像分割与分析方法研究，2003，山东科技大学硕士学位论文}}
+   \begin{itemize}
+   \item 通过对图像进行极限腐蚀算法，获得种子点
+   \item 极限腐蚀即再腐蚀一次，区域就会完全消失
+   \item 以种子点为基础，向外进行膨胀运算，当两个区域膨胀的交汇点就是分离点
+   \end{itemize}
+\end{frame} 
+
+
+\begin{frame}
+  \frametitle{基于凹点搜寻的重叠细胞图像分割\footnote{傅蓉，细胞重叠与融合性图像的分离与分割技术研究，2007，第一军医大学博士学位论文}}
+   凹点：大多数重叠细胞会在重叠区域中所出现的凹陷点\\
+   一般情况下，凹点基本都是分离点，因此可以通过连接凹点来分割图像\\
+   \begin{figure}[!ht]
+   \centering
+   \includegraphics[width=2.5in]{aopoint.png}
+   \end{figure}
+\end{frame} 
+
+
+
+\begin{frame}
+    通过凸闭包结构提取出图像的凹区，从而提取凹点，进行分割重叠图像
+      \begin{figure}
+   \begin{minipage}[t]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{aoqu1.png} \\
+     原图
+   \end{minipage}
+   \begin{minipage}[t]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{aoqu2.png} \\
+     凸闭包
+   \end{minipage}
+   \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{aoqu3.png} \\
+     凹区
+   \end{minipage}
+   \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{aoqu4.png} \\
+     凹区轮廓
+   \end{minipage}
+   \end{figure}
+\end{frame}
+ 
+
+
+\begin{frame}
+  \begin{itemize}
+   \item 串联：直接将成对的凹点连成直线分离重叠区域
+   \item 并联：凹点与重叠区域的核心连接成直线分离重叠区域
+   \end{itemize}
+  \begin{figure}
+   \begin{minipage}[t]{0.5\textwidth} 
+     \centering 
+     \includegraphics[width=3.0in]{split1.png} \\
+      串联
+   \end{minipage}
+   \begin{minipage}[t]{0.5\textwidth} 
+     \centering 
+     \includegraphics[width=3.0in]{split2.png} \\
+      并联
+   \end{minipage}
+   \end{figure}
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{基于凹点搜索与边缘检测\footnote{左香玉，重叠细胞的判别与分割计数方法研究，2011，太原理工大学硕士学位论文}}
+  \begin{itemize}
+  \item 曲率判别法：用各种检测算子获得轮廓图，根据重叠处是凹形的，在其他区域是凸型的，重叠处曲率是负的，非重叠曲率是正的
+  \item 粒度测量法：根据粒度测量获得细胞半径，根据链码值估计质心，在边界设置分离点，达到分离重叠的目的
+  \item 边界几何特征法：用链码来定义图像边界，搜索重叠处的凹点，凹点即为分割点
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{数学形态学方法}
+  \begin{itemize}
+  \item 膨胀腐蚀算法：反复进行腐蚀操作运算，直到细胞在凹处分开，再做膨胀运算，使用形态学重构法，得到原大小的单个目标
+  \item 测地重建法：对二值图像做距离变换，对核心进行测地膨胀运算，重建原图
+  \item 分水岭变换：灰度图像看做地质表面，通过注水建立堤坝\newline
+  \end{itemize}
+    \hspace{0.3in}现在方法基本都是要求细胞是非凸性，即存在凹区域、凹点，一般这类细胞都是圆形或者类圆形的
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{腐蚀膨胀算法\footnote{潘晨，一种分割重叠粘连细胞图像的改进算法，中国生物医学工程学报，Vol.25，No.4}}
+  \begin{itemize}
+  \item 对原重叠图像反复进行腐蚀操作运算，直到细胞在凹处分开
+  \item 再做膨胀运算，对图像进行重构，得到原大小的单个目标
+  \item 图像的复杂性会对运算过程产生一定影响
+  \item 腐蚀和膨胀的次数需要人工确定，而且腐蚀和膨胀的不可逆性会造成一定的误差
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{测地重建法\footnote{马东,分割重叠细胞核的方法及比较研究,北京生物医学工程，1999.Vol.18，No.3}}
+  \begin{itemize}
+  \item 对二值图做连续腐蚀，图像各部分趋于分离并逐渐变小
+  \item 直到极限腐蚀获得几何中心区，使每一部分若再腐蚀一次就会消失，即距离变换的区域最大
+  \item 对获得的几何中心区进行测地膨胀，直到重建原图，此时各相邻中心区膨胀相会形成分界线
+  \item 极限腐蚀可选用大的结构元素以提高分割运算速度，而测地膨胀的结构元小一点保证重建精度
+  \item 算法的全过程都是自动完成的
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{分水岭算法\footnote{陆振晔，范影乐，庞全，基于数学形态学的重叠细胞分离方法及比较研究，计算机与工程应用，2004年06期}}
+  \begin{itemize}
+  \item 基于重叠区存在局部梯度差的梯度信息，通过对重叠区梯度图像进行处理
+  \item 在过程中建立“堤坝”，确定细胞的边缘与分界线\newline
+  \end{itemize}
+  提高分水岭分割的质量：
+  \begin{itemize}
+  \item 种子点
+  	\begin{itemize}
+  	\item 根据图像细胞，人工设置种子点
+  	\item 由极限腐蚀自动得到种子点
+  	\end{itemize}
+  \item 标记符
+  	\begin{itemize}
+  	\item 针对目标中大量局部最小区域或最大区域的位置进行标记
+  	\item 处在目标中的内部标记符集合和包含在背景中的外部标记符集合来修改梯度图像
+  	\end{itemize}
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+   \begin{Huge}
+   \textbf{Thank you very much!}
+   \end{Huge}
+\end{frame}
+
+
+
+
+\end{document}
