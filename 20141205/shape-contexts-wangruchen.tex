@@ -1,0 +1,241 @@
+\documentclass[notheorems,mathserif,table,compress]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{comment}
+\usepackage{fancybox}
+\usepackage{tcolorbox}
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+% \usecolortheme[<options>]{<name list>}
+%% Font Themes
+% \usefonttheme[<options>]{<name>}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+%\begin{comment}
+\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+  \frame<handout:0>{
+    \frametitle{Contents}\small
+    \tableofcontents[current,currentsubsection]
+  }
+}
+\AtBeginSubsection[]                            % 在每个子段落之前
+{
+  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+  {
+    \frametitle{Contents}\small
+    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+  }
+}
+%\end{comment}
+%%----------------------------------------------------------
+\title[形状上下文]{形状上下文}
+\author[wrc]{汇报人~~~~\textcolor{olive}{王如晨}}
+%\hspace{2.28em}导师~~\textcolor{olive}{}~教授}
+\institute[ouc]{\small\textcolor{violet}{中国海洋大学~~~~信息科学与工程学院}}
+\date{2014年12月}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}  %海大校徽
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{目录}
+\frame{\frametitle{Contents}\tableofcontents}
+%%----------------------------------------------------------
+
+%\section{Beamer类和XeTeX概览} %如果你想书签不出现问题,请不要用\XeTeX
+                                 %这类复杂的指令,直接写XeTeX吧
+\begin{comment}
+\section{形状上下文定义}
+
+%\subsection{是什么？}
+
+\begin{frame}
+\frametitle{形状上下文\footnote{Serge Belongie,Jitendra Malik,Jan Puzicha.Shape Matching and Object Recognition Using Shape Contexts.PAMI.2002.}}
+  %\begin{tcolorbox}[colback=red!5,colframe=blue!75!black]
+   {\color{blue}\textbf{形状上下文}}将形状轮廓看作一个轮廓点集的基础上，根据轮廓序列上参考点与该轮廓序列上其他所有点的空间位置分部关系对物体的轮廓形状进行描述。\vspace{3ex}\\ %空行
+{\color{blue}\textbf{优点}}\footnote{周瑜,刘俊涛,白翔.形状匹配方法研究与展望.自动化学报.2012.}：
+\begin{itemize}
+\item 这种表示方法有丰富的信息，对形状描述能力非常强。
+\item 在尺度变化、平移和旋转时保持不变。
+\item 在发生小的几何扭曲和存在异常点的时候具有较好的鲁棒性。
+\end{itemize}
+
+  %\end{tcolorbox}
+\end{frame}
+\end{comment}
+
+\section{基于形状上下文的形状匹配}
+
+\begin{frame}
+\frametitle{形状上下文怎样进行形状表示}
+\begin{tcolorbox}[colback=red!5,colframe=blue!75!black]
+~~~~~~首先，提取形状边缘的轮廓点，为了让提取出来的轮廓点集最大程度的表示目标的真实形状，这些轮廓点集的质心坐标应该尽量与原形状质心坐标一致。
+%\frametitle{基本流程}
+   \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1in]{lunkuodian.png}
+    \caption{形状边缘轮廓点}
+   \end{figure}
+\end{tcolorbox}
+\end{frame}
+
+\begin{frame}
+%\frametitle{基本流程}
+形状上下文：用形状直方图来描述轮廓点集中每一个点在整个形状中所处的相对位置。
+\begin{displaymath}
+h_{i}(k)=\#\{q \neq p_{i} : (q-p_{i}) \in bin(k)\}
+\end{displaymath}
+   \begin{figure}[!ht]
+    \begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=2in]{zhifang.png}
+    \caption{建立对数极坐标系}
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=2in]{zhifangtu.png}
+    \caption{该点直方图}
+    \end{minipage}
+   \end{figure}
+\end{frame}
+
+\begin{frame}
+%\frametitle{基本流程}
+   \begin{figure}[!ht]
+    \centering
+   \includegraphics[width=1.5in]{liangtu.png}
+    \caption{进行匹配的形状}
+   \end{figure}
+~~~~~~对于两个形状中的点，为了判断它们之间是否匹配，先计算出它们之间的匹配代价值（$\chi^{2}$距离）:
+\begin{displaymath}
+C_{ij}=\frac{1}{2}\sum_{k=1}^{k}\frac{[h_{i}(k)-h_{j}(k)]^{2}}{h_{i}(k)+h_{j}(k)}
+\end{displaymath}
+\end{frame}
+
+\begin{frame}
+~~~~~~根据这个公式可以得到两个目标之间的代价矩阵$C$。
+\begin{displaymath}
+\left( \begin{array}{cccc}
+C_{11} & C_{12} & \ldots & C_{1n} \\
+C_{21} & C_{22} & \ldots & C_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+C_{n1} & C_{n2} & \ldots & C_{nn}
+\end{array} \right)
+\end{displaymath}
+
+~~~~~~然后根据得到的代价矩阵进行点的匹配，是如下公式获得最小值：
+\begin{displaymath}
+\sum_{i}C(p_{i},q_{\pi(i)})
+\end{displaymath}
+~~~~~~这个匹配问题是一个典型的双向图匹配，利用{\color{blue}匈牙利算法}进行匹配。
+
+\end{frame}
+
+
+\begin{comment}
+\begin{frame}
+\frametitle{匈牙利算法}
+找到两个子集之间的最大匹配关系。
+   \begin{figure}[!ht]
+    \begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=1in]{xiong1.png}
+
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=1in]{xiong2.png}
+
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=1in]{xiong3.png}
+
+    \end{minipage}
+   \end{figure}
+\end{frame}
+\end{comment}
+
+\begin{frame}
+
+
+   \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=2in]{pipei.png}
+   \end{figure}
+\end{frame}
+
+\section{内距离形状上下文}   
+ 
+\begin{frame}
+\frametitle{内距离形状上下文\footnote{Haibin Ling,David W.Jacobs.Shape Classification Using the Inner-Distance.PAMI.2007.}}
+\begin{itemize}
+\item 用内距离代替欧式距离
+\item 用内部角代替相对位置
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{内距离}
+{\color{blue}\textbf{内距离}}定义为在形状内部链接轮廓上两个点的最短路径的长度。
+   \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1.3in]{neijuli.png}
+   \end{figure}
+   \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=2in]{bijiao.png}
+   \end{figure}
+{\color{blue}最短路径算法}采用Johnson算法或Floyd-Warshall算法。
+\end{frame}      
+
+\begin{frame}
+\frametitle{内部角}
+{\color{blue}\textbf{内部角}}是起始点切线与最短路径间的夹角。
+   \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=3in]{neibujiao.png}
+   \end{figure}
+\end{frame}   
+
+\begin{frame}
+\frametitle{形状上下文和内距离形状上下文对比}
+   \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=3in]{idsc.png}
+   \end{figure}
+\end{frame}   
+
+
+\end{document}
+
