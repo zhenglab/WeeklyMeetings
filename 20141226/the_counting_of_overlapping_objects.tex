@@ -1,0 +1,271 @@
+\documentclass[notheorems,mathserif,table,compress]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{comment}
+\usepackage{fancybox}
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+\usetheme{Madrid}
+%% Inner Themes
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+\useoutertheme{miniframes} 
+%% Color Themes 
+% \usecolortheme[<options>]{<name list>}
+%% Font Themes
+% \usefonttheme[<options>]{<name>}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+\begin{comment}
+\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+  \frame<handout:0>{
+    \frametitle{Content}\small
+    \tableofcontents[current,currentsubsection]
+  }
+}
+\AtBeginSubsection[]                            % 在每个子段落之前
+{
+  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+  {
+    \frametitle{下一节内容}\small
+    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+  }
+}
+\end{comment}
+%%----------------------------------------------------------
+\title[]{The Counting of Overlapping Objects}
+\author[戴嘉伦]{\textcolor{olive}{戴嘉伦}}
+  %\hspace{2.28em}导师~~\textcolor{olive}{姬光荣}~教授}
+\institute[中国海洋大学]{\small\textcolor{violet}{中国海洋大学}}
+\date{\today}
+%\titlegraphic{\vspace{-6em}\includegraphics[height=7cm]{ouc}\vspace{-6em}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{目录}
+\frame{\frametitle{目录}\tableofcontents}
+%%----------------------------------------------------------
+
+%\section{Beamer类和XeTeX概览} %如果你想书签不出现问题,请不要用\XeTeX
+                                 %这类复杂的指令,直接写XeTeX吧
+\section{应用:计数}
+\begin{frame}
+  \frametitle{应用}
+   在实际应用中，对于计数问题，需要注重重叠问题。\\
+   \hspace{0.2in}方法：
+   \begin{itemize}
+	\item 不分割重叠物体进行计数
+	\item 分割重叠物体进行计数
+   \end{itemize}
+\end{frame}
+
+\section{不分割重叠}
+\begin{frame}
+    \frametitle{不分割重叠}
+    重叠藻类计数\footnote{武宗茜,王鹏，丁天怀，活动轮廓模型在重叠藻细胞计数中的应用，计算机工程，2012.Vol.38，No.3}：
+    \begin{itemize}
+       \item 采用活动轮廓模型算法提取重叠藻细胞边缘，进行边缘分析和计数
+       \item 活动轮廓模型具有检测精度高、易建模、适合提取任意形状的变形轮廓且简单的优点
+    \end{itemize}
+    步骤：
+    \begin{itemize}
+       \item 对二值图进行连通域进行连通域标记，每完成一次标记，记录连通域外接矩形坐标和连通域面积
+       \item 运用活动轮廓模型分割，对目标图像进行分割，获得目标边缘坐标，保存在矩阵中，根据矩阵判断该边缘是否为封闭边缘
+       \item 根据封闭边缘个数的不同，来分辨藻细胞个数完成计数
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \begin{figure}
+   \begin{minipage}[t]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.2in]{juxing.png} \\
+     外接矩形
+   \end{minipage}
+   \begin{minipage}[t]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{zao1.png} \\
+     封闭边缘为1
+   \end{minipage}
+   \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{zao2.png} \\
+     封闭边缘为2
+   \end{minipage}
+   \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{zao3.png} \\
+     封闭边缘为3
+   \end{minipage}
+   \end{figure}
+\end{frame}
+
+
+
+\begin{frame}
+    \frametitle{不分割重叠}
+   重叠细胞识别\footnote{刘斌，基于奇异值分解的显微图像重叠细胞识别，2005，吉林大学硕士学位论文}：\\
+   \begin{itemize}
+       \item 二维自适应阈值分割方法
+        \begin{itemize}
+	   \item 图像像素灰度和像素点领域平均灰度的二维直方图阈值
+	   \item 利用了图像像素与其领域的空间相关信息，更强的抗噪声能力
+	\end{itemize}
+       \item 边界剥离方法进一步分割
+	\begin{itemize}
+	   \item 对重叠细胞区域进行层层剥离，判断是否发生了细胞分裂
+	   \item 若发生分裂，在刚剥离的那层边界上，搜索局部分离点，从而在原图上搜索分离点；否则继续剥离
+	   \item 避免一般分离算法要求重叠细胞连接处的凹陷性比较明显
+	   \item 要求在细胞连接处存在局部最小灰度值
+	\end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+   \begin{itemize}
+	\item 细胞识别
+	\begin{itemize}
+	    \item 利用特征向量空间，采用奇异值特征方法，对细胞进行奇异值分解，用结果矩阵表示一个细胞
+   	    \item 通过真实样本的图像矩阵的奇异值特征向量，计算图像归属度，得到阈值
+	    \item 求待测图像矩阵的奇异值特征向量，计算其图像归属度，通过与阈值的比较，判断待测图像为哪一类图像
+	    \item 比传统的纹理分析方法、灰度方差阵等方法有更好的效果和更准确的识别率
+	\end{itemize}
+   \end{itemize}
+   \begin{figure}
+     \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.0in]{shibie1.png} \\
+     识别结果(a)
+   \end{minipage}
+   \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.1in]{shibie2.png} \\
+     识别结果(b)
+   \end{minipage}
+   \end{figure}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{不分割重叠}
+    显微图像分割\footnote{王祥生，王伟，基于清晰度的细胞显微图像分割和计数方法，中国医学影像学杂志，2014，Vol.2，No.10：797-800}：
+    \begin{itemize}
+        \item 对图像灰度化，并进行离散余弦变换（DCT）变换，低频部分表示图像轮廓，高频部分表示细节特性
+     	\item 将低频信号值一半作为阈值，截断高频信号，进行反DCT变换到灰度空间，与原灰度图像求差并灰度化
+    \end{itemize}
+     \begin{figure}
+     \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.4in]{dct1.png} \\
+     (a)
+   \end{minipage}
+   \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.4in]{dct2.png} \\
+     (b)
+   \end{minipage}
+   \end{figure}
+\end{frame}
+
+\begin{frame}
+    \begin{itemize}
+    	\item 自适应阈值法将差值图像二值化，消除离散噪声点，进行区域生长
+    	\item 连通区域标记，在区域外接矩形坐标核连通区域面积，通过聚类的方法，得到两类
+    	\item 将两类中面积较小的一类的面积中值作为单个细胞面积，估计其他连通区域包含的细胞个数，得到总体的细胞个数
+    \end{itemize}
+     \begin{figure}
+     \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.4in]{dct3.png} \\
+     (c)
+   \end{minipage}
+   \begin{minipage}[b]{0.4\textwidth} 
+     \centering 
+     \includegraphics[width=1.4in]{dct4.png} \\
+     (d)
+   \end{minipage}
+   \end{figure}
+\end{frame}
+
+\section{分割重叠}
+\begin{frame}
+    \frametitle{分割重叠}
+    \begin{itemize}
+        \item 分水岭算法：对不同区域设计标记，循环标记结果形成分水岭
+        \item 形态学方法：利用腐蚀操作找到分割点，并实现重叠颗粒的分割
+        \item 凹点匹配：利用凹点来描述边界的凹陷情况（常用）
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{凹点匹配\footnote{韦冬冬，基于凹点匹配的重叠图像分割算法，计算机与应用化学，2010，Vol.27，No.1}}
+    \begin{itemize}
+	\item 启发式搜索算法:从重叠区域凹点序列中取一组起始点和结束点
+	\item 凹点序列中的最大曲率点作为起始点，将距离该起始点最近的1个凹点作为终止点，实现重叠区域的分割
+	\item 根据重叠情况使用不同凹点匹配方法，根据匹配凹点之间的距离是否小于给定的阈值来判断是否匹配
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    P为当前边界点，M为前继点，N为后继点\\
+    通过向量的夹角与阈值比较，判断凹点是否为分离点对
+     \begin{figure}
+     \begin{minipage}[b]{0.5\textwidth} 
+     \centering 
+     \includegraphics[width=2.0in]{aodian1.png} \\
+     凹点判断（a）
+   \end{minipage}
+   \begin{minipage}[b]{0.5\textwidth} 
+     \centering 
+     \includegraphics[width=1.9in]{aodian2.png} \\
+     凹点判断（b）
+   \end{minipage}
+   \end{figure}
+\end{frame}
+
+\section{补全}
+\begin{frame}
+    \frametitle{检测方法}
+    \begin{itemize}
+	\item 主动轮廓模型方法（Active Contour Method）
+	\item Mumford-shah Function: \newline
+	\begin{displaymath}
+	E_i(u,C)=\frac{1}{2} \int_{\Omega} (f-u)^2 dx + 
+        \frac{\lambda^2}{2} \int_{\Omega-C} \lvert \triangledown u\rvert ^2 dx +
+	v \int_{0}^{1} C_s^2 ds 
+	\end{displaymath}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+   \begin{Huge}
+   \textbf{Thank you very much!}
+   \end{Huge}
+\end{frame}
+
+
+\end{document}
