@@ -1,0 +1,314 @@
+\documentclass[notheorems,serif,table,compress]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{verbatim}
+\usepackage{mathabx}
+\usepackage{latexsym}
+\usepackage{amsfonts,amssymb}
+\usepackage{iplouclistings}
+\usepackage{fancybox}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+%\usepackage[T1]{fontenc}
+%\usepackage{bookman}
+\usepackage{subfigure}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{animate}
+\usepackage[absolute,overlay]{textpos}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage[americaninductors,europeanresistors]{circuitikz}
+
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+%\usetheme{Madrid}
+\usetheme{Berkeley}
+%% Inner Themes双精度计算
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+%\useoutertheme{miniframes} 
+%% Color Themes 
+%\usecolortheme[<options>]{<name list>}
+%% Font Themes
+\usefonttheme{serif}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{zhfontcfg}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------listing------------------------
+\lstset{language=[LaTeX]TeX,Python}
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+%\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+%  \frame<handout:0>{
+%    \frametitle{Contents}\small
+%    \tableofcontents[current,currentsubsection]
+%  }
+%}
+%
+%\AtBeginSubsection[]                            % 在每个子段落之前
+%{
+%  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+%  {
+%    \frametitle{Contents}\small
+%    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+%  }
+%}
+
+%%----------------------------------------------------------
+\logo{\includegraphics[scale=0.13]{logol.png}}
+\title{Paper Sharing}
+\subtitle{Bottom-Up Saliency Detection Model Based on Human Visual Sensitivity and Amplitude Spectrum}
+\author[]{\textcolor{olive}{Zhao Hongmiao}}
+\institute[CVBIOUC]
+{
+\small\textcolor{violet}{CVBIOUC\\
+Ocean University of China\\
+\url{http://vision.ouc.edu.cn/~zhenghaiyong}}
+}
+\date[December 26, 2014]{December 26, 2014}
+\titlegraphic{
+\includegraphics[height=1.0cm]{ouc-logo.png}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{Contents}
+\frame{\frametitle{Contents}\tableofcontents}
+%%----------------------------------------------------------
+\def\hilite<#1>{\temporal<#1>{\color{blue!15}}{\color{black}}{\color{black}}}
+\newcommand{\shadow}[2][purple]{\hskip5pt\shadowbox{\color{#1}\small \kai #2\vspace{3mm}}}
+\newcommand{\colorrbox}[2][purple]{\doublebox{\color{#1}\small \kai#2}}
+
+%============================================================================
+
+\section{Introduction}
+
+\begin{frame}
+\frametitle{Introduction}
+\begin{itemize}
+\item Author
+%\tcblower
+\begin{itemize}
+\begin{columns}
+\begin{column}{\leftmargini}
+\end{column}
+\begin{column}{.5\linewidth}
+\item {Fang Yuming}
+\item 1984.10.
+\item lecturer 
+\item Jiangxi University of Finance and Economics
+\end{column}
+\begin{column}{0.5\linewidth}
+
+\begin{figure}
+ \includegraphics[width=1.8cm]{FangYuming}
+\end{figure}
+
+\end{column}
+\end{columns}\vspace{1ex}
+\end{itemize}
+
+\item Citation
+\begin{itemize}
+\item IEEE TRANSACTIONS ON MULTIMEDIA
+\item Impact Factor: 1.776
+\item Citation Rate: 31
+\end{itemize}
+
+\item Highlights
+\begin{itemize}
+\item The human visual sensitivity and QFT amplitude spectrum
+\item Application: image retargeting
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%==========================================================================
+\section{Model}
+
+\begin{frame}
+\frametitle{Saliency Detection Model}
+\begin{figure}
+ \includegraphics[width=4.5cm]{framework}
+ \caption{Framework of the proposed saliency detection model.}
+\end{figure}
+
+\end{frame}
+
+%--------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Saliency Value for Each Patch}
+\begin{itemize} 
+\item Two factors
+\begin{itemize} 
+\item The patch differences between this image patch and all other image patches in the input image$\Longrightarrow$ {\color{blue}$\mathcal{D}_{(i,j)}$}
+\item  The weighting for these patch differences$\Longrightarrow$ {\color{blue}$\alpha_{ij}$}
+\end{itemize}
+\item Definition
+\begin{itemize} 
+\begin{tcolorbox}[colback=blue!5,colframe=blue!75!black] 
+\item $S_{i}=\sum_{j\neq i}\alpha_{ij}\mathcal{D}_{(i,j)}$ 
+\end{tcolorbox}
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%--------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Differences Between Image Patches and Their Weighting to Saliency Value}
+\begin{itemize} 
+\item Differences Between Image Patches
+\begin{itemize} 
+\item Quaternion Fourier Transform
+\item $\mathcal{D}_{(i,j)}=\sqrt{\sum_{m}(log(\mathcal{A}_{m}^{i}+1)-log(\mathcal{A}_{m}^{j}+1))^{2}}$
+\end{itemize}
+\item The weight for the patch difference between different patches\footnote{W.S.~Geisler and J.S.~Perry, “A real-time foveated multi-solution system for low-bandwidth video communication,” in Proc. SPIE, Jul. 1998, vol. 3299, pp. 294–305.} 
+\begin{equation}
+\mathcal{C}_{s}(f,e)=\frac{1}{\mathcal{C}_{t}(f,e)}
+\end{equation}
+\begin{equation}
+\mathcal{C}_{t}(f,e)=\mathcal{C}_{0}exp(\alpha f\frac{e+e_{2}}{e_{2}})
+\end{equation}
+\begin{equation}
+e=tan^{-1}(\frac{d}{v})
+\end{equation}
+\begin{equation}
+\alpha_{ij}=\frac{1}{\mathcal{C}_{0}exp(\alpha f\frac{e+e_{2}}{e_{2}})}
+\end{equation}
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Patch Size and Scale for Final Saliency Value}
+\begin{itemize} 
+\item Patch Size
+\begin{figure}
+ \includegraphics[width=6cm]{PatchSize}
+ \caption{Original images and its different saliency maps with different patch sizes.}
+\end{figure}
+\begin{itemize}
+\item The smaller image patch size, the more accurate saliency map we can get.
+\item Suitable patch size: consideration of {\color{blue}fovea characteristics}, {\color{blue}saliency detection performance}, and {\color{blue}the computational complexity}.
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Patch Size and Scale for Final Saliency Value}
+\begin{itemize} 
+\item Scale
+\begin{itemize}
+\item the steerable pyramid algorithm
+\item $S_{i}=\frac{1}{N} \sum_{k}S_{i}^{k}$
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%================================================================================
+\section{Evaluations}
+
+\begin{frame}
+\frametitle{Evaluations}
+\begin{itemize}
+\item Database: MSRA\footnote{T. Liu, J. Sun, N. Zheng, X. Tang, and H. Y. Shum, “Learning to detect a salient object,” in Proc. IEEE Int. Conf. Computer Vision and Pattern Recognition, 2007.} 
+\item Comparison methods: PO, SR, MD, FG (temporary abbreviation)
+\end{itemize}
+\begin{figure}
+ \includegraphics[width=4.5cm]{comparison}
+ \caption{Experiment results for the comparison between the proposed model and others.}
+\end{figure}
+
+\end{frame}
+
+%=================================================================================
+\section{Conclusions}
+
+\begin{frame}
+\frametitle{Conclusions}
+\begin{itemize}
+\item {\color{blue}Advantages}
+\begin{itemize}
+\item Image Patch $\Longrightarrow$ Superpixels
+\item $\mathcal{D}_{(i,j)}$ is novel
+\item Steerable pyramid algorithm
+\end{itemize}
+\item {\color{blue}Disadvantages}
+\begin{itemize}
+\begin{columns}
+\begin{column}{\leftmargini}
+\end{column}
+\begin{column}{.5\linewidth}
+\item Accuracy
+\item Computational complexity
+\end{column}
+\begin{column}{0.5\linewidth}
+
+\begin{figure}
+ \includegraphics[width=2.5cm]{ManHua}
+\end{figure}
+
+\end{column}
+\end{columns}\vspace{1ex}
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%===============================================================================
+\section{Thinking}
+\begin{frame}
+\frametitle{Thinking}
+\begin{itemize}
+\item Conclusion in frequency domain
+\begin{textblock*}{10cm}(2cm,5.5cm)
+\rowcolors[]{1}{blue!20}{blue!10}
+\begin{tabular}{cc|cc}
+Model & Method & Model & Method \\
+SR & Residual Spectrum & HFT & SSS  \\
+PFT & Only Phase Spectrum & SDSP & log-Gabor  \\
+SIG & DCT+Sign & FT & DoG
+\end{tabular}
+\end{textblock*}
+\end{itemize}
+\end{frame}
+
+%=================================================================================
+\begin{frame}
+\begin{figure}\centering
+\begin{minipage}[t]{1\linewidth}
+\includegraphics[width=\linewidth]{thank.jpg}
+\end{minipage}
+\end{figure}
+
+\end{frame}
+
+
+\end{document}
