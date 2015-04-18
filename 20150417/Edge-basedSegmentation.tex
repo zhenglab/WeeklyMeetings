@@ -1,0 +1,435 @@
+\documentclass[notheorems,serif,table,compress]{beamer}  %dvipdfm选项是关键,否则编译统统通不过
+%%------------------------常用宏包------------------------
+%%注意, beamer 会默认使用下列宏包: amsthm, graphicx, hyperref, color, xcolor, 等等
+\usepackage{fontspec,xunicode,xltxtra}  % for XeTeX
+\usepackage{verbatim}
+\usepackage{mathabx}
+\usepackage{latexsym}
+\usepackage{amsfonts,amssymb}
+\usepackage{styles/iplouclistings}
+\usepackage{fancybox}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+%\usepackage[T1]{fontenc}
+%\usepackage{bookman}
+\usepackage{subfigure}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{animate}
+\usepackage[absolute,overlay]{textpos}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage[americaninductors,europeanresistors]{circuitikz}
+\usepackage{tikz}
+\usepackage{fancybox}     %% 定义zhushadow时用到
+\usepackage{pifont} %ding用到
+\newsavebox{\mysaveboxOne}  %%为了在only中使用lstlisting
+\newsavebox{\mysaveboxTwo}
+\newsavebox{\mysaveboxThree}
+\newsavebox{\mysaveboxFour}
+\newsavebox{\mysaveboxFive}
+\newsavebox{\mysaveboxSix}
+\newsavebox{\mysaveboxSeven}
+\newcommand\zhushadow[2][purple]{\hskip5pt\shadowbox{\color{#1}\small\kai #2\vspace{3mm}}}
+
+%%------------------------ThemeColorFont------------------------
+%% Presentation Themes
+% \usetheme[<options>]{<name list>}
+%\usetheme{Madrid}
+\usetheme{Berkeley}
+%% Inner Themes双精度计算
+% \useinnertheme[<options>]{<name>}
+%% Outer Themes
+% \useoutertheme[<options>]{<name>}
+%\useoutertheme{miniframes} 
+%% Color Themes 
+%\usecolortheme[<options>]{<name list>}
+%% Font Themes
+\usefonttheme{serif}
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!7] %%背景色, 上25%的蓝, 过渡到下白.
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{navigation symbols}{}   %% 去掉页面下方默认的导航条.
+\usepackage{styles/zhfontcfg}
+%\setsansfont[Mapping=tex-text]{文泉驿正黑}  %% 需要fontspec宏包
+     %如果装了Adobe Acrobat,可在font.conf中配置Adobe字体的路径以使用其中文字体
+     %也可直接使用系统中的中文字体如SimSun,SimHei,微软雅黑 等
+     %原来beamer用的字体是sans family;注意Mapping的大小写,不能写错
+     %设置字体时也可以直接用字体名，以下三种方式等同：
+     %\setromanfont[BoldFont={黑体}]{宋体}
+     %\setromanfont[BoldFont={SimHei}]{SimSun}
+     %\setromanfont[BoldFont={"[simhei.ttf]"}]{"[simsun.ttc]"}
+%%------------------------MISC------------------------
+\graphicspath{{figures/}}         %% 图片路径. 本文的图片都放在这个文件夹里了.
+%%------------------------listing------------------------
+%\lstset{language=[LaTeX]TeX,Python}
+%%------------------------正文------------------------
+\begin{document}
+\XeTeXlinebreaklocale "zh"         % 表示用中文的断行
+\XeTeXlinebreakskip = 0pt plus 1pt % 多一点调整的空间
+%%----------------------------------------------------------
+%% This is only inserted into the PDF information catalog. Can be left
+%% out.
+%%%
+%% Delete this, if you do not want the table of contents to pop up at
+%% the beginning of each subsection:
+%\AtBeginSection[]{                              % 在每个Section前都会加入的Frame
+%  \frame<handout:0>{
+%    \frametitle{Contents}\small
+%    \tableofcontents[current,currentsubsection]
+%  }
+%}
+%
+%\AtBeginSubsection[]                            % 在每个子段落之前
+%{
+%  \frame<handout:0>                             % handout:0 表示只在手稿中出现
+%  {
+%    \frametitle{Contents}\small
+%    \tableofcontents[current,currentsubsection] % 显示在目录中加亮的当前章节
+%  }
+%}
+
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+%%----------------------------------------------------------
+\logo{\includegraphics[scale=0.13]{ouclogo.png}}
+\title{Edge-based Image Segmentation}
+%\subtitle{Bottom-Up Saliency Detection Model Based on Human Visual Sensitivity and Amplitude Spectrum}
+\subtitle{基于边缘检测的图像分割}
+\author[]{\textcolor{olive}{Wang RuChen}}
+\institute[CVBIOUC]
+{
+\small\textcolor{violet}{CVBIOUC\\
+%Ocean University of China\\
+\url{http://vision.ouc.edu.cn/~zhenghaiyong}}
+}
+\date[]{}
+%\titlegraphic{
+%\includegraphics[height=1.0cm]{ouc-logo.jpg}}
+\frame{ \titlepage }
+%%----------------------------------------------------------
+%\section*{Contents}
+\frame{\frametitle{Contents}\tableofcontents}
+%%----------------------------------------------------------
+\def\hilite<#1>{\temporal<#1>{\color{blue!15}}{\color{black}}{\color{black}}}
+\newcommand{\shadow}[2][purple]{\hskip5pt\shadowbox{\color{#1}\small \kai #2\vspace{3mm}}}
+\newcommand{\colorrbox}[2][purple]{\doublebox{\color{#1}\small \kai#2}}
+
+%============================================================================
+
+\section{Introduction}
+
+%==========================================================================
+
+
+\begin{frame}[fragile]
+\frametitle{What?}
+    \begin{figure}
+    \includegraphics[width=0.8\linewidth]{edgeseg.png} 
+    \end{figure}
+\end{frame}
+
+
+
+\subsection{Edge \& Boundary}
+\begin{frame}
+\frametitle{Edge \& Boundary}
+{\color{blue}Edge \& Boundary}
+%边缘是指图像那些周围灰度发生突变的像素集合，表明一个区域的终结，也表明另一个区域开始的地方。\\
+%是现实场景中的存在于物体之间的界线。\\
+    \begin{figure}
+    \begin{minipage}[t]{0.3\linewidth}
+    \centering
+    \includegraphics[width=1\linewidth]{src.png} 
+    \end{minipage}
+    \begin{minipage}[t]{0.3\linewidth}
+    \centering
+    \includegraphics[width=1\linewidth]{edge.png} 
+    \end{minipage}
+    \begin{minipage}[t]{0.3\linewidth}
+    \centering
+    \includegraphics[width=1\linewidth]{bounary.png} 
+    \end{minipage}
+    \end{figure}
+
+~~~~~The edge of object may be not a boundary, the boundary may also be not edge.
+\end{frame}
+ 
+%\subsection{基于边缘检测的分割流程}
+ 
+\subsection{Problems}
+\begin{frame}
+\frametitle{Problems}
+Edge detection is a simple and fast technique used in segmentation methods. However, there also are some problems:
+    \begin{itemize}
+    \item {\color{blue}Noise and background affect the accurate of edge detection.}
+    \item Edges are the sign of lack of continuity, and ending.
+    \end{itemize}
+    \begin{figure}
+    \begin{minipage}[t]{0.4\linewidth}
+    \centering
+    \includegraphics[width=1\linewidth]{0_0_284.jpg} 
+    \end{minipage}
+    \begin{minipage}[t]{0.4\linewidth}
+    \centering
+    \includegraphics[width=1\linewidth]{noise.png} 
+    \end{minipage}
+    \end{figure}
+\end{frame}
+
+\subsection{Steps in Edge Detection}
+\begin{frame}
+\frametitle{Steps in Edge Detection}
+    \begin{enumerate}
+    \item {\color{blue}Filtering:} Filtering to reduce noise results in a loss of edge strength.
+    \item {\color{blue}Enhancement:} In order to facilitate the detection of edges, it is essential to determine changes in intensity in the neighborhood of a point. 
+    \item {\color{blue}Detection:} Find the zero crossing and peak value to detect edge.
+    %\item {\color{blue}Location:}method should be used to determine which points are edge points
+    \end{enumerate}
+\end{frame}
+
+\subsection{Problems}
+\begin{frame}
+\frametitle{Problems}
+Edge detection is a simple and fast technique used in segmentation methods. However, there also are some problems:
+    \begin{itemize}
+    \item Noise and background affect the accurate of edge detection.
+    \item {\color{blue}Edges are the sign of lack of continuity, and ending.}
+    \end{itemize}
+    \begin{figure}
+    \begin{minipage}[t]{0.4\linewidth}
+    \centering
+    \includegraphics[width=1\linewidth]{0_0_284.jpg} 
+    \end{minipage}
+    \begin{minipage}[t]{0.4\linewidth}
+    \centering
+    \includegraphics[width=1\linewidth]{noise.png} 
+    \end{minipage}
+    \end{figure}
+\end{frame}
+
+\subsection{Steps in Image Segmentation}
+\begin{frame}
+\frametitle{Step in Image Segmentation}
+    \begin{figure}
+    \includegraphics[width=1\linewidth]{liucheng.jpg} 
+    \end{figure}
+\end{frame}
+
+
+
+%---------注释了
+\begin{comment}
+\section{边缘检测}
+
+\begin{frame}
+\frametitle{边缘检测方法}
+\begin{itemize}
+\item Roberts算子
+\item Sobel算子
+\item Prewitt算子
+\item Kirsch算子
+\item Marr-Hildreth 边缘检测
+\item LoG算子
+\item Canny算子
+\end{itemize}
+\end{frame}
+\end{comment}
+%--------
+
+
+
+\section{Edge Detection}
+\begin{frame}
+\frametitle{Edge Detection}
+Three edge types and definitions:
+\begin{itemize}
+\item Step edge
+\item Ramp edge
+\item Roof edge
+\end{itemize}
+    \begin{figure}
+    \includegraphics[width=0.9\linewidth]{bian.png} 
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Edge Detection}
+    \begin{figure}
+    \includegraphics[width=0.35\linewidth]{jiance.png} 
+    \end{figure}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Edge Detection Techniques\footnote{Muthukrishnan.R \textit{et al.}, ``Edge Detection Techniques For 
+Image Segmentation'', IJCSIT, 2011. }}
+\begin{itemize}
+\item Roberts Edge Detection
+\item Sobel Edge Detection
+\item Prewitt Edge Detection
+\item Kirsch Edge Detection
+\item Marr-Hildreth Edge Detection (LoG)
+\item Canny Edge Detection
+\end{itemize}
+\end{frame}
+
+\subsection{Edge Detection Techniques}
+\begin{frame}        
+\frametitle{Edge Detection Techniques}
+\begin{itemize}
+\item Roberts Edge Detection
+    \begin{figure}
+    \includegraphics[width=0.8\linewidth]{roberts.png} 
+    \end{figure}
+\item Sobel Edge Detection
+    \begin{figure}
+    \includegraphics[width=0.8\linewidth]{sobel.png} 
+    \end{figure}
+\item Prewitt Edge Detection
+    \begin{figure}
+    \includegraphics[width=0.8\linewidth]{prewitt.png} 
+    \end{figure}
+\end{itemize}
+\end{frame}
+
+\subsection{Marr-Hildreth}
+\begin{frame}
+\frametitle{Marr-Hildreth Edge Detection (LoG)}
+\begin{columns}
+\begin{column}{0.55\linewidth}
+This method combines Gaussian filtering with the Laplacian for edge detection.\newline
+
+{\color{blue}How does it work?}
+    \begin{itemize}
+    \item The edge points of an image can be detection by {\color{blue}second derivation}.
+    \item However, the second derivation is very sensitive to noise. A {\color{blue}Gaussian filer} is used to swipe away noise from the image.
+    \end{itemize}
+\end{column}
+\begin{column}{0.45\linewidth}
+\centering\includegraphics[width=1.5in]{erjie.png}
+\end{column}
+\end{columns}\vspace{1ex}
+\end{frame}
+
+\subsection{Canny}
+\begin{frame}
+\frametitle{Canny Edge Detection}
+Canny is the best edge detection detector.\newline
+
+Three basic objectives:
+\begin{itemize}
+\item Low error rate
+\item Edge points should be well localized
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Canny Edge Detection}
+Canny algorithm:
+\begin{itemize}
+\item Smooth image
+\item Compute gradient
+\item Non-maxima suppression
+\item Double thresholding
+\end{itemize}
+    \begin{figure}
+    \includegraphics[width=0.8\linewidth]{canny.png} 
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Canny Edge Detection}
+Non-maxima suppression (NMS)
+\begin{itemize}
+\item Problem: Edges generated using gradient typically contain wide ridges around local maxima.
+\item Use non-maxima suppression to thin those ridges to find thin edges corresponding to local maxima.
+\end{itemize}
+    \begin{figure}
+    \includegraphics[width=0.6\linewidth]{non.png} 
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Canny Edge Detection}
+Double thresholding
+\begin{itemize}
+\item Problem: The received image may still contain false edge points.
+\end{itemize}
+    \begin{figure}
+    \includegraphics[width=0.6\linewidth]{doub.png} 
+    \end{figure}
+\end{frame}
+
+\section{Edge Linking}
+
+\begin{frame}
+\frametitle{Edge Linking}
+    \begin{itemize}
+    \item Edge Tracking
+    \item Curve Fitting
+    \item Hough Transform
+    \item Dynamic Programming\\
+    $\dots$
+    \end{itemize}
+\end{frame}
+  
+\subsection{Edge Tracking}
+\begin{frame}
+\frametitle{Edge Tracking}
+Each point is linked to the adjacent if magnitude and direction of the gradient are similar.\newline
+\begin{tcolorbox}[colback=red!5,colframe=blue!75!black]
+$e(x,y)$ is magnitude of the gradient, $\phi(x,y)$ is the direction of the gradient, if two each points meet the following conditions：
+    \begin{displaymath}
+        \left\{ \begin{array}{ll}
+        \mid e(x_{i},y_{i})-e(x_{j},y_{j}) \mid \leq E\\
+        \mid \phi(x_{i},y_{i})-\phi(x_{j},y_{j}) \mid \leq A\\
+        \mid e(x_{i},y_{i}) \mid , \mid e(x_{j},y_{j}) \mid > E
+         \end{array} \right.
+\end{displaymath}
+\end{tcolorbox}
+\end{frame}
+
+\subsection{Curve Fitting}
+\begin{frame}
+\frametitle{Curve Fitting}
+Starting from a set of edge points, segments of a polygonal line are iteratively added until all the points are close enough to a segment.
+    \begin{figure}
+    \includegraphics[width=0.4\linewidth]{nihe.png} 
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Polygon Fitting}
+    \begin{figure}
+    \includegraphics[width=0.8\linewidth]{duoni.png} 
+    \end{figure}
+\end{frame}
+
+\subsection{Hough Transform}
+\begin{frame}
+\frametitle{Hough Transform}
+Find the most probable lines.
+    \begin{figure}
+    \includegraphics[width=0.8\linewidth]{hough.png} 
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Hough Transform}
+    \begin{figure}
+    \includegraphics[width=0.8\linewidth]{hough2.png} 
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+  \vspace{2cm}
+  \centering
+  \Huge{Thanks}\\
+  \vspace{1.5cm}
+ 
+
+\end{frame}
+%===============================================================================
+
+
+\end{document}
