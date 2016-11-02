@@ -1,0 +1,88 @@
+    #include <opencv2/core/core.hpp>  
+    #include <opencv2/highgui/highgui.hpp>  
+    #include <iostream>  
+      
+    using namespace cv;  
+    using namespace std;  
+      
+    #define TWO_PI 6.2831853071795864769252866  //2*pi;
+       
+    double generateGaussianNoise()  
+    {  
+        static bool hasSpare = false;  
+        static double rand1, rand2;  
+       
+        if(hasSpare)  
+        {  
+            hasSpare = false;  
+            return sqrt(rand1) * sin(rand2);  
+        }  
+       
+        hasSpare = true;  
+       
+        rand1 = rand() / ((double) RAND_MAX);  
+        if(rand1 < 1e-100) rand1 = 1e-100;  
+        rand1 = -2 * log(rand1);  
+        rand2 = (rand() / ((double) RAND_MAX)) * TWO_PI;  
+       
+        return sqrt(rand1) * cos(rand2);  
+    }  
+      
+      
+    void AddGaussianNoise(Mat& I)  
+    {  
+        
+        CV_Assert(I.depth() != sizeof(uchar));  
+      
+        int channels = I.channels();  
+      
+        int nRows = I.rows;  
+        int nCols = I.cols * channels;  
+      
+        if(I.isContinuous()){  
+            nCols *= nRows;  
+            nRows = 1;  
+        }  
+      
+        int i,j;  
+        uchar* p;  
+        for(i = 0; i < nRows; ++i){  
+            p = I.ptr<uchar>(i);  
+            for(j = 0; j < nCols; ++j){  
+                double val = p[j] + generateGaussianNoise() * 4;  
+                if(val < 0)  
+                    val = 0;  
+                if(val > 255)  
+                    val = 255;  
+      
+                p[j] = (uchar)val;  
+      
+            }  
+        }  
+      
+    }  
+      
+      
+      
+    int main()  
+    {  
+       
+      
+        Mat image;  
+        image = imread("22.jpg", 1);
+      
+        if(! image.data )ut  
+        {  
+            cout << "Could not open or find the image" << std::endl ;  
+            return -1;  
+        }  
+      
+        imshow( "Display window", image );  
+        AddGaussianNoise(image);                   // 添加高斯噪声；     
+        imshow( "Noisy image", image ); 
+        imwrite( "4noise.jpg", image );  
+        waitKey(0); 
+      
+      
+        return 0;  
+    }  
