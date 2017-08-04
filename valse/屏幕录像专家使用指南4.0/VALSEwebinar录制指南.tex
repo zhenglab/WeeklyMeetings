@@ -1,0 +1,389 @@
+
+\documentclass[12pt]{ctexart}
+%%---------------------------------------------------------------------
+% packages
+% geometry
+\usepackage{geometry}
+% font
+\usepackage{fontspec}
+\defaultfontfeatures{Mapping=tex-text}  %%如果没有它，会有一些 tex 特殊字符无法正常使用，比如连字符。
+\usepackage{xunicode,xltxtra}
+%\usepackage[BoldFont,SlantFont,CJKnumber,CJKchecksingle]{xeCJK}  % \CJKnumber{12345}: 一万二千三百四十五
+\usepackage{CJKfntef}  %%实现对汉字加点、下划线等。
+\usepackage{pifont}  % \ding{}
+% math
+\usepackage{amsmath,amsfonts,amssymb}
+% color
+\usepackage{color}
+\usepackage{xcolor}
+\definecolor{EYE}{RGB}{199,237,204}
+\definecolor{FLY}{RGB}{128,0,128}
+\definecolor{ZHY}{RGB}{139,0,255}
+% graphics
+\usepackage[americaninductors,europeanresistors]{circuitikz}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows,shadows,shapes,calc,mindmap,trees,backgrounds}  % placements=positioning
+\usepackage{graphicx}  % \includegraphics[]{}
+\usepackage{subfigure}  %%图形或表格并排排列
+\usepackage{fancyvrb}
+\usepackage{listings}%代码高亮
+\lstset{language=C++}%这条命令可以让LaTeX排版时将C++键字突出显示
+\lstset{breaklines}%这条命令可以让LaTeX自动将长的代码行换行排版
+\lstset{extendedchars=false}
+% table
+\usepackage{colortbl,dcolumn}  %% 彩色表格
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{booktabs}
+% code
+\usepackage{fancyvrb}
+\usepackage{listings}
+% title
+\usepackage{titlesec}
+% head/foot
+\usepackage{fancyhdr}
+% ref
+\usepackage{hyperref}
+% pagecolor
+\usepackage[pagecolor={EYE}]{pagecolor}
+% tightly-packed lists
+\usepackage{mdwlist}
+
+%\usepackage{styles/iplouccfg}
+%\usepackage{styles/zhfontcfg}
+%\usepackage{styles/iplouclistings}
+
+%%---------------------------------------------------------------------
+% settings
+% geometry
+\geometry{left=2cm,right=1cm,top=2cm,bottom=2cm}  %设置 上、左、下、右 页边距
+\linespread{1.5} %行间距
+% font
+%\setCJKmainfont{Adobe Kaiti Std}
+%\setmainfont[BoldFont=Adobe Garamond Pro Bold]{Apple Garamond}  % 英文字体
+%\setmainfont[BoldFont=Adobe Garamond Pro Bold,SmallCapsFont=Apple Garamond,SmallCapsFeatures={Scale=0.7}]{Apple Garamond}  %%苹果字体没有SmallCaps
+\setCJKmonofont{Adobe Fangsong Std}
+% graphics
+\graphicspath{{figures/}}
+\tikzset{
+    % Define standard arrow tip
+    >=stealth',
+    % Define style for boxes
+    punkt/.style={
+           rectangle,
+           rounded corners,
+           draw=black, very thick,
+           text width=6.5em,
+           minimum height=2em,
+           text centered},
+    % Define arrow style
+    pil/.style={
+           ->,
+           thick,
+           shorten <=2pt,
+           shorten >=2pt,},
+    % Define style for FlyZhyBall
+    FlyZhyBall/.style={
+      circle,
+      minimum size=6mm,
+      inner sep=0.5pt,
+      ball color=red!50!blue,
+      text=white,},
+    % Define style for FlyZhyRectangle
+    FlyZhyRectangle/.style={
+      rectangle,
+      rounded corners,
+      minimum size=6mm,
+      ball color=red!50!blue,
+      text=white,},
+    % Define style for zhyfly
+    zhyfly/.style={
+      rectangle,
+      rounded corners,
+      minimum size=6mm,
+      ball color=red!25!blue,
+      text=white,},
+    % Define style for new rectangle
+    nrectangle/.style={
+      rectangle,
+      draw=#1!50,
+      fill=#1!20,
+      minimum size=5mm,
+      inner sep=0.1pt,}
+}
+\ctikzset{
+  bipoles/length=.8cm
+}
+% code
+\lstnewenvironment{VHDLcode}[1][]{%
+  \lstset{
+    basicstyle=\footnotesize\ttfamily\color{black},%
+    columns=flexible,%
+    framexleftmargin=.7mm,frame=shadowbox,%
+    rulesepcolor=\color{blue},%
+%    frame=single,%
+    backgroundcolor=\color{yellow!20},%
+    xleftmargin=1.2\fboxsep,%
+    xrightmargin=.7\fboxsep,%
+    numbers=left,numberstyle=\tiny\color{blue},%
+    numberblanklines=false,numbersep=7pt,%
+    language=VHDL%
+    }\lstset{#1}}{}
+\lstnewenvironment{VHDLmiddle}[1][]{%
+  \lstset{
+    basicstyle=\scriptsize\ttfamily\color{black},%
+    columns=flexible,%
+    framexleftmargin=.7mm,frame=shadowbox,%
+    rulesepcolor=\color{blue},%
+%    frame=single,%
+    backgroundcolor=\color{yellow!20},%
+    xleftmargin=1.2\fboxsep,%
+    xrightmargin=.7\fboxsep,%
+    numbers=left,numberstyle=\tiny\color{blue},%
+    numberblanklines=false,numbersep=7pt,%
+    language=VHDL%
+    }\lstset{#1}}{}
+\lstnewenvironment{VHDLsmall}[1][]{%
+  \lstset{
+    basicstyle=\tiny\ttfamily\color{black},%
+    columns=flexible,%
+    framexleftmargin=.7mm,frame=shadowbox,%
+    rulesepcolor=\color{blue},%
+%    frame=single,%
+    backgroundcolor=\color{yellow!20},%
+    xleftmargin=1.2\fboxsep,%
+    xrightmargin=.7\fboxsep,%
+    numbers=left,numberstyle=\tiny\color{blue},%
+    numberblanklines=false,numbersep=7pt,%
+    language=VHDL%
+    }\lstset{#1}}{}
+% pdf
+\hypersetup{pdfpagemode=FullScreen,%
+            pdfauthor={Haiyong Zheng},%
+            pdftitle={Title},%
+            CJKbookmarks=true,%
+            bookmarksnumbered=true,%
+            bookmarksopen=false,%
+            plainpages=false,%
+            colorlinks=true,%
+            citecolor=green,%
+            filecolor=magenta,%
+            linkcolor=cyan,%red(default)
+            urlcolor=cyan}
+% section
+%http://tex.stackexchange.com/questions/34288/how-to-place-a-shaded-box-around-a-section-label-and-name
+\newcommand\titlebar{%
+\tikz[baseline,trim left=3.1cm,trim right=3cm] {
+    \fill [cyan!25] (2.5cm,-1ex) rectangle (\textwidth+3.1cm,2.5ex);
+    \node [
+        fill=cyan!60!white,
+        anchor= base east,
+        rounded rectangle,
+        minimum height=3.5ex] at (3cm,0) {
+        \textbf{\thesection.}
+    };
+}%
+}
+\titleformat{\section}{\Large\bf\color{blue}}{\titlebar}{0.1cm}{}
+% head/foot
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}
+\fancyhf{}
+
+\chead{\color{black!50!green}VALSE Webinar录制指南}
+
+\lfoot{\color{blue!50!green}}
+\cfoot{\color{blue!50!green}\href{http://vision.ouc.edu.cn/~zhenghaiyong}{Vision@OUC}}
+\rfoot{\color{blue!50!green}$\cdot$\ \thepage\ $\cdot$}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+%%---------------------------------------------------------------------
+\begin{document}
+%%---------------------------------------------------------------------
+%%---------------------------------------------------------------------
+% \titlepage
+\title{VALSE Webinar录制指南}
+\author{Vision@OUC}
+%\date{\vspace{-0.7em}December 26th, 2014\vspace{-0.7em}}
+%%---------------------------------------------------------------------
+\maketitle\thispagestyle{fancy}
+%%---------------------------------------------------------------------
+\maketitle
+%\tableofcontents
+%-------------------------------------------------------------------------------------------
+\section{QQ相关设置}
+登录QQ之后，为了避免弹出窗口或者其他聊天信息的干扰，将QQ状态设置为“请勿打扰”。如图~\ref{qq}所示。群里放出多人视频聊天的链接之后，点击链接进入。
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.2\textwidth]{QQset.png}
+\caption{QQ免打扰设置}
+\label{qq}
+\end{figure}
+
+
+%-------------------------------------------------------------------------------------------
+\section{Camtasia Studio 使用指南}
+\subsection{录制准备工作}
+\begin{enumerate}
+\item 打开Camtasia Studio 软件，选择{\color{blue}{新建项目}}选项，并点击{\color{blue}{录制}}（如图~\ref{fig:1.PNG}所示）。
+    \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=3in]{1.PNG}
+    \caption{选择录制屏幕}
+    \label{fig:1.PNG}
+    \end{figure}  
+    
+\item 设置录像参数（如图~\ref{fig:2.PNG}所示），选择区域设置为{\color{blue}{全屏}}，录制音频设置为（如图~\ref{fig:03.png}所示）。
+    \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{2.PNG}
+    \caption{设置录像参数}
+    \label{fig:2.PNG}
+    \end{figure}  
+    \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{03.png}
+    \caption{设置录制音频}
+    \label{fig:03.png}
+    \end{figure}
+\end{enumerate}
+
+\subsection{录制}
+\begin{enumerate}
+\item 点击{\color{blue}{rec}}开始录制。\par
+\item 点击{\color{blue}{F10}}停止录制。\par
+\item 系统自动生成并保存录制文件，如图~\ref{fig:3.PNG}所示。
+    \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{3.PNG}
+    \caption{保存录制文件}
+    \label{fig:3.PNG}
+    \end{figure}
+\end{enumerate}
+
+\subsection{导出mp4文件}\label{sec:daochu}
+\begin{enumerate}
+\item 点击右上角{\color{blue}{分享}}，并选择本地文件。如图~\ref{fig:04.jpg}所示；选择{\color{blue}{1080p}}，如图~\ref{fig:05.jpg}所示。\par
+    \begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{04.jpg}
+    \caption{点击右上角分享按钮}
+    \label{fig:04.jpg}
+    \end{figure}
+    \begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{05.jpg}
+    \caption{选择编辑尺寸}
+    \label{fig:05.jpg}
+    \end{figure}
+ %2. 点击{\color{blue}{“文件”-“保存项目”}}，保存xxxx..camproj文件。\par
+ 
+ \item xxxx.mp4文件正在生成如图~\ref{fig:07.jpg}所示。
+     \begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{07.jpg}
+    \caption{mp4文件生成中}
+    \label{fig:07.jpg}
+    \end{figure}
+ 
+ 
+\item 点击{\color{blue}{下一步}}，如图~\ref{fig:06.jpg}所示。填写项目名称，以及相关的文件输出路径，并点击{\color{blue}{完成}}。\par
+     \begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{06.jpg}
+    \caption{生成mp4文件}
+    \label{fig:06.jpg}
+    \end{figure}
+\end{enumerate}
+
+
+
+
+\subsection{裁剪视频}
+\begin{enumerate}
+\item 点击Camtasia Studio软件上方的鼠标按钮，如图~\ref{fig:09.jpg}所示。\par
+     \begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{09.jpg}
+    \caption{点击编辑按钮}
+    \label{fig:09.jpg}
+    \end{figure}
+\item 拖拽视频大小，只留讲者的{\color{blue}{ppt部分}}，使得视频等比例放大(上下不留黑边、左右可有黑边)，并左右移动视频使其处于正中央，可以参考网站已上传裁剪完毕的视频。如图~\ref{fig:10.jpg}大小即可。\par
+     \begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{10.jpg}
+    \caption{选择合适大小的方框}
+    \label{fig:10.jpg}
+    \end{figure}
+\item 按照Subsection~\ref{sec:daochu}导出mp4文件。\\
+{\color{blue}{注}}：原始视频和裁剪后的视频都需要生成及保存。
+\end{enumerate} \newpage
+%-------------------------------------------------------------------------------------------
+\section{文件命名规范}
+\begin{enumerate}
+ \item 未经过裁剪的.mp4文件，命名方式为“VALSE-日期-作者-单位.mp4”，如：
+
+  {\color{blue}VALSE-20170716-姓名-OUC（没有简写就写全称）.mp4 (一位讲者)}  或
+
+  {\color{blue}VALSE-20170716-姓名-OUC-ZihanZhou-PennStateUniversity.mp4 (两位讲者)}
+
+如果还不明白可以去vision.ouc.edu.cn上查看命名格式。
+ \item 裁剪后的.mp4文件，命名方式为“VALSE-日期-作者-单位-publish.mp4”，如：
+
+  {\color{blue}VALSE-20170716-姓名-OUC-publish.mp4}  或
+
+  {\color{blue}VALSE-20170716-姓名-OUC-ZihanZhou-PennStateUniversity-publish.mp4}
+
+\end{enumerate}
+%----------------------------------------------------------------------------------------------
+\section{上传方法}
+\begin{enumerate}
+ \item 首先将文件权限修改为644，否则其他人无法下载
+
+   ``chmod 644 filename"
+
+ \item 通过scp命令将文件上传到服务器的对应目录：
+
+{\color{blue}未裁剪过的：}
+
+  ``scp filename zhenghaiyong@211.64.142.66:/fly/download/valse/videos/raw/"
+
+{\color{blue}裁剪过的：}
+
+  ``scp filename zhenghaiyong@211.64.142.66:/fly/download/valse/videos/"
+
+ \item 输入密码完成上传
+
+\end{enumerate}
+
+\section{修改文件名方法}
+\begin{enumerate}
+ \item 登录服务器
+
+``ssh zhenghaiyong@211.64.142.66"
+
+ \item 输入密码进行登录
+
+ \item 修改文件名
+
+{\color{blue}未裁剪过的：}
+
+  ``mv /fly/download/valse/videos/unedited/old-filename /fly/download/valse/videos/raw/new-filename"
+
+{\color{blue}裁剪过的：}
+
+  ``mv /fly/download/valse/videos/old-filename /fly/download/valse/videos/new-filename"
+  
+ \item 删除上传错误的文件
+ 
+ 参照修改文件名中的路径, 把mv命令换成我们熟悉的rm命令即可, 注意别删错文件啦!
+\end{enumerate}
+
+
+
+
+
+{\color{red}为了保证最佳录制的效果，录制成员要多沟通、测试，避免其他问题的发生。}
+%%---------------------------------------------------------------------
+\end{document}
